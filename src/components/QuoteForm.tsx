@@ -118,6 +118,7 @@ export function QuoteForm({ showPrices: showPricesProp = false }: QuoteFormProps
   }, [setPhases, removeAnswer]);
 
   const handleProjectTypeSelect = (type: ProjectType) => {
+    console.log('Project type selected:', type);
     // Reset everything first, then set the new project type
     useQuoteStore.getState().reset();
     setProjectType(type);
@@ -215,24 +216,36 @@ export function QuoteForm({ showPrices: showPricesProp = false }: QuoteFormProps
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <button
-                onClick={() => handleProjectTypeSelect('web-dev')}
-                className="p-8 border-2 border-gray-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all text-left group"
+                type="button"
+                onClick={() => {
+                  console.log('Web Dev button clicked');
+                  handleProjectTypeSelect('web-dev');
+                }}
+                className="p-8 border-2 border-gray-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all text-left group cursor-pointer"
               >
                 <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-blue-600">Web Development</h3>
                 <p className="text-base text-gray-600">Website design and development services</p>
               </button>
               
               <button
-                onClick={() => handleProjectTypeSelect('brand')}
-                className="p-8 border-2 border-gray-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all text-left group"
+                type="button"
+                onClick={() => {
+                  console.log('Brand button clicked');
+                  handleProjectTypeSelect('brand');
+                }}
+                className="p-8 border-2 border-gray-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all text-left group cursor-pointer"
               >
                 <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-blue-600">Brand</h3>
                 <p className="text-base text-gray-600">Brand identity and guidelines</p>
               </button>
               
               <button
-                onClick={() => handleProjectTypeSelect('campaign')}
-                className="p-8 border-2 border-gray-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all text-left group"
+                type="button"
+                onClick={() => {
+                  console.log('Campaign button clicked');
+                  handleProjectTypeSelect('campaign');
+                }}
+                className="p-8 border-2 border-gray-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all text-left group cursor-pointer"
               >
                 <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-blue-600">Campaign</h3>
                 <p className="text-base text-gray-600">Marketing campaigns and strategies</p>
