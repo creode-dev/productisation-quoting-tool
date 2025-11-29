@@ -1,0 +1,177 @@
+Phase,Item,Unit Cost (£),Essential,Refresh,Transformation,Ranges,Tooltip,Question Type,Options,Min,Max,Required,Validation
+Discovery,Discovery questionnaire,150,1,1,1,
+Discovery,Kickoff meeting/session,200,1,1,1,
+Discovery,Meeting notes + recording,50,1,1,1,
+Discovery,AI transcription summary,75,1,1,1,
+Discovery,Stakeholder interviews,500,0,1,1,"1-2:500, 3-5:450, 6+:400"
+Discovery,Stakeholder interview summaries (AI-generated),100,0,1,1,"1-2:100, 3-5:90, 6+:80"
+Discovery,Cross-stakeholder synthesis document,800,0,0,1
+Discovery,Asset collection folder,50,1,1,1
+Discovery,Document repository,100,1,1,1
+Discovery,Brand guidelines analysis (AI),150,1,1,1
+Discovery,Competitor identification,200,0,1,1
+Discovery,Competitor deep-dive analyses,300,0,1,1
+Discovery,Competitor comparison table/report,400,0,1,1
+Discovery,Competitive landscape report,600,0,0,1
+Discovery,Analytics access setup (GA4 + Search Console),150,0,1,1
+Discovery,GA4 analysis,300,0,1,1
+Discovery,Search Console analysis,250,0,1,1
+Discovery,Analytics insights document,400,0,1,1
+Discovery,Customer interviews,600,0,0,1,"1-3:600, 4-6:550, 7+:500"
+Discovery,Customer interview summaries (AI-generated),150,0,0,1,"1-3:150, 4-6:140, 7+:130"
+Discovery,Customer insights synthesis,500,0,0,1
+Discovery,Customer insight report,800,0,0,1
+Discovery,Persona development,400,0,1,1
+Discovery,Persona documents,200,0,1,1
+Discovery,Customer journey mapping (current state),600,0,0,1
+Discovery,Compliance requirements audit,500,0,0,1
+Discovery,Compliance requirements checklist,300,0,0,1
+Discovery,Technical audit,400,0,1,1
+Discovery,Technical requirements specification,800,0,0,1
+Discovery,Integration requirements specification,600,0,0,1
+Discovery,Platform assessment notes,300,0,1,1
+Discovery,Journey mapping (for new site),500,0,0,1
+Discovery,Journey maps (visual),400,0,0,1
+Discovery,Journey synthesis document,600,0,0,1
+Discovery,Strategy deck development,1200,0,0,1
+Discovery,Stakeholder presentation,400,0,0,1
+Discovery,Presentation recording,100,0,0,1
+Discovery,Alignment workshop,500,0,0,1
+Discovery,Alignment notes,150,0,0,1
+Discovery,Discovery summary document,300,1,1,1
+Discovery,Complete discovery package,200,0,0,1
+Discovery,Team briefing deck,400,0,0,1
+Discovery,Internal team handoff workshop,300,0,0,1
+UX,Information architecture development,800,1,1,1
+UX,Site map,400,1,1,1
+UX,Content matrix,500,0,0,1
+UX,Content audit (if existing site),600,0,0,1
+UX,Content audit spreadsheet,200,0,0,1
+UX,Navigation architecture document,500,0,0,1
+UX,User journey mapping,400,0,1,1
+UX,Journey flow diagrams,300,0,1,1
+UX,Touchpoint analysis,500,0,0,1
+UX,Touchpoint analysis document,400,0,0,1
+UX,Conversion optimization strategy,600,0,0,1
+UX,Conversion strategy document,500,0,0,1
+UX,Wireframe templates,300,1,1,1
+UX,Wireframe detail level,200,1,1,1
+UX,Interactive annotations,150,0,0,1
+UX,Prototype,800,0,0,1
+UX,User testing preparation,300,0,0,1
+UX,User testing script,200,0,0,1
+UX,User testing sessions,400,0,0,1,"1-3:400, 4-6:350, 7+:300"
+UX,User testing recordings,100,0,0,1
+UX,User testing analysis,500,0,0,1
+UX,User testing report,400,0,0,1
+UX,Iteration based on testing,600,0,0,1
+UX,UX strategy deck,800,0,0,1
+UX,UX documentation package,300,0,1,1
+UX,Client presentations,200,1,1,1
+UX,Revision rounds,150,1,1,1
+UX,Client feedback documentation,100,1,1,1
+Design,Design routes developed,500,1,1,1
+Design,Design route presentation,300,0,1,1
+Design,Design route presentation deck,400,0,1,1
+Design,Homepage designs,600,1,1,1
+Design,Template designs,400,1,1,1
+Design,Responsive breakpoints,200,1,1,1
+Design,Interactive states designed,300,0,0,1
+Design,Design system development,800,0,0,1
+Design,Component library,300,1,1,1
+Design,Number of components,50,1,1,1
+Design,Typography scale documentation,200,0,0,1
+Design,Color system documentation,200,0,0,1
+Design,Spacing/grid system documentation,200,0,0,1
+Design,Design system documentation,500,0,0,1
+Design,Content strategy development,400,0,1,1
+Design,Messaging framework,600,0,0,1
+Design,Tone of voice guidelines,400,0,1,1
+Design,SEO content recommendations,300,0,1,1
+Design,Content templates,200,0,1,1
+Design,Content guidance document,300,0,1,1
+Design,Style guide,400,0,1,1
+Design,Developer handoff documentation,500,0,0,1
+Design,Design files (Figma),200,1,1,1
+Design,Client presentations,200,1,1,1
+Design,Revision rounds,150,1,1,1
+Design,Client feedback documentation,100,1,1,1
+Development,Development environment setup,300,1,1,1
+Development,Staging site URL,100,1,1,1
+Development,Git repository,50,1,1,1
+Development,Mosaic™ Framework installation,200,1,1,1
+Development,Template implementation,500,1,1,1
+Development,Mosaic™ blocks/components,200,1,1,1
+Development,Number of custom blocks,300,0,1,1,"1-5:300, 6-10:280, 11+:250"
+Development,Custom functionality,800,0,0,1
+Development,Number of custom features,1000,0,0,1
+Development,Advanced custom fields,400,0,0,1
+Development,Content implementation,100,1,1,1
+Development,Number of pages content implemented,50,1,1,1
+Development,Image optimization,5,1,1,1
+Development,Number of images optimized,2,1,1,1
+Development,Compliance implementation,300,1,1,1
+Development,Cookie consent,150,1,1,1
+Development,Privacy policy integration,200,1,1,1
+Development,Regulatory disclaimers,300,0,1,1
+Development,Standard integrations,400,1,1,1
+Development,GA4 integration,200,1,1,1
+Development,Contact form setup,150,1,1,1
+Development,Standard plugins integration,100,1,1,1
+Development,Custom integrations,600,0,0,1
+Development,Responsive development,400,1,1,1
+Development,Internal QA rounds,200,1,1,1
+Development,Client review rounds (staging),150,1,1,1
+Development,Revision rounds,100,1,1,1
+Development,Development documentation,300,0,1,1
+Testing,QA testing,400,1,1,1
+Testing,Browsers tested,100,1,1,1
+Testing,Devices tested,150,1,1,1
+Testing,QA report/checklist,200,1,1,1
+Testing,Functional testing,300,1,1,1
+Testing,Accessibility testing,400,1,1,1
+Testing,Accessibility tools used,50,1,1,1
+Testing,Accessibility report,300,1,1,1
+Testing,Screen reader testing,500,0,0,1
+Testing,Keyboard navigation testing,300,0,0,1
+Testing,Disabled user testing,400,0,0,1
+Testing,Performance optimization,500,1,1,1
+Testing,Performance report,200,1,1,1
+Testing,Core Web Vitals optimization,400,0,1,1
+Testing,Security implementation,300,1,1,1
+Testing,Security report,400,0,0,1
+Testing,Penetration testing,600,0,0,1
+Testing,Bug fixes,200,1,1,1
+Launch Prep,Technical SEO implementation,300,1,1,1
+Launch Prep,Meta tags,5,1,1,1
+Launch Prep,XML sitemap,100,1,1,1
+Launch Prep,Robots.txt,50,0,1,1
+Launch Prep,Schema markup,200,0,0,1
+Launch Prep,301 redirects (if migration),2,0,1,1
+Launch Prep,Number of redirects,1,0,1,1
+Launch Prep,SEO documentation,300,0,1,1
+Launch Prep,Analytics setup,200,1,1,1
+Launch Prep,GA4 configuration,300,1,1,1
+Launch Prep,Goal/conversion tracking,400,0,1,1
+Launch Prep,Event tracking,300,0,0,1
+Launch Prep,Analytics documentation,200,0,1,1
+Launch Prep,Mosaic Lens integration,150,1,1,1
+Launch Prep,Mosaic Lens configuration,200,1,1,1
+Launch Prep,Training sessions,300,1,1,1
+Launch Prep,Training format,100,1,1,1
+Launch Prep,Training materials,200,1,1,1
+Launch Prep,Mosaic Lens training,150,1,1,1
+Launch Prep,CMS training,300,1,1,1
+Launch Prep,Launch plan,400,0,0,1
+Launch Prep,Rollback plan,300,0,0,1
+Launch Prep,Launch runbook,400,0,0,1
+Launch,Launch execution,500,1,1,1
+Launch,Post-launch monitoring,200,0,1,1
+Launch,Launch report,300,1,1,1
+Post-Launch,Bug fix warranty,200,1,0,0
+Post-Launch,Performance review,400,0,0,1
+Post-Launch,Performance report,300,0,0,1
+Post-Launch,Optimization recommendations,500,0,0,1
+Post-Launch,Mosaic Lens monitoring,100,1,1,1
+Post-Launch,Mosaic™ CMS access,50,1,1,1
+

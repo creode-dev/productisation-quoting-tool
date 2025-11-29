@@ -1,0 +1,215 @@
+OUTPUT,ESSENTIAL (£8k+),REFRESH (£20k+),TRANSFORMATION (£60k+)
+TIMELINE,4-6 weeks,8-10 weeks,14-18 weeks
+,,,
+PHASE 1: DISCOVERY,,,
+Discovery questionnaire,✅,✅,✅
+Kickoff meeting/session,✅ (1 hour),✅ (2 hours),✅ (2 hours)
+Meeting notes + recording,✅,✅,✅
+AI transcription summary,✅,✅,✅
+Stakeholder interviews,❌,1-2,5-8
+Stakeholder interview summaries (AI-generated),❌,1-2,5-8
+Cross-stakeholder synthesis document,❌,❌,✅
+Asset collection folder,✅,✅,✅
+Document repository,✅,✅,✅
+Brand guidelines analysis (AI),✅,✅,✅
+Competitor identification,❌,3-4,5-8
+Competitor deep-dive analyses,❌,3-4 (surface),5-8 (deep)
+Competitor comparison table/report,❌,✅ (table),✅ (15-20 slides)
+Competitive landscape report,❌,❌,✅ (15-20 slides)
+Analytics access setup (GA4 + Search Console),❌,✅,✅
+GA4 analysis,❌,✅ (basic),✅ (deep-dive)
+Search Console analysis,❌,✅ (basic),✅ (deep-dive)
+Analytics insights document,❌,✅ (5 pages),✅ (5-10 pages)
+Customer interviews,❌,❌,3-5
+Customer interview summaries (AI-generated),❌,❌,3-5
+Customer insights synthesis,❌,❌,✅
+Customer insight report,❌,❌,✅ (10-15 pages)
+Persona development,❌,✅ (assumptions doc),3-4 (detailed)
+Persona documents,❌,✅ (1 doc),3-4 (1-2 pages each)
+Customer journey mapping (current state),❌,❌,✅
+Compliance requirements audit,❌,❌,✅
+Compliance requirements checklist,❌,❌,✅ (5-10 pages)
+Technical audit,❌,✅ (basic notes),✅ (full audit)
+Technical requirements specification,❌,❌,✅ (10-15 pages)
+Integration requirements specification,❌,❌,✅
+Platform assessment notes,❌,✅,✅
+Journey mapping (for new site),❌,❌,4-6
+Journey maps (visual),❌,❌,4-6
+Journey synthesis document,❌,❌,✅ (5-10 pages)
+Strategy deck development,❌,❌,✅ (30-40 slides)
+Stakeholder presentation,❌,❌,✅ (2 hours)
+Presentation recording,❌,❌,✅
+Alignment workshop,❌,❌,✅
+Alignment notes,❌,❌,✅
+Discovery summary document,✅ (2-3 pages),✅ (5-10 pages),✅ (5-10 pages)
+Complete discovery package,❌,❌,✅
+Team briefing deck,❌,❌,✅
+Internal team handoff workshop,❌,❌,✅
+Discovery Phase Subtotal Outputs,3,8,23
+,,,
+PHASE 2: UX,,,
+Information architecture development,✅,✅,✅
+Site map,✅ (up to 12 pages),✅ (up to 25 pages),✅ (unlimited)
+Content matrix,❌,❌,✅
+Content audit (if existing site),❌,❌,✅
+Content audit spreadsheet,❌,❌,✅
+Navigation architecture document,❌,❌,✅
+User journey mapping,❌,2-3 (simplified),4-6 (with emotions)
+Journey flow diagrams,❌,2-3,4-6
+Touchpoint analysis,❌,❌,✅
+Touchpoint analysis document,❌,❌,✅
+Conversion optimization strategy,❌,❌,✅
+Conversion strategy document,❌,❌,✅
+Wireframe templates,4-5,6-8,10-15
+Wireframe detail level,Basic (PDF/basic Figma),Detailed (Figma),Full (Figma + annotations)
+Interactive annotations,❌,❌,✅
+Prototype,❌ (static wireframes),❌ (static wireframes),✅ (clickable)
+User testing preparation,❌,❌,✅
+User testing script,❌,❌,✅
+User testing sessions,❌,❌,5-8
+User testing recordings,❌,❌,5-8
+User testing analysis,❌,❌,✅
+User testing report,❌,❌,✅
+Iteration based on testing,❌,❌,✅
+UX strategy deck,❌,❌,✅ (15-20 slides)
+UX documentation package,❌,✅ (notes),✅ (complete)
+Client presentations,1,2,3
+Revision rounds,1,2,3
+Client feedback documentation,✅,✅,✅
+UX Phase Subtotal Outputs,3,5,15
+,,,
+PHASE 3: DESIGN,,,
+Design routes developed,1,2,2-3
+Design route presentation,❌,✅,✅
+Design route presentation deck,❌,✅,✅
+Homepage designs,1,2 (routes) + 1 (final),2-3 (routes) + 1 (final)
+Template designs,2-3,6-8,10-15
+Responsive breakpoints,Desktop + mobile,Desktop + mobile,Desktop + tablet + mobile
+Interactive states designed,❌,❌,✅
+Design system development,❌,❌ (basic consistency),✅ (full system)
+Component library,✅ (basic Mosaic™),✅ (basic Mosaic™),✅ (full Mosaic™)
+Number of components,Standard only,15-25,30-50
+Typography scale documentation,❌,❌,✅
+Color system documentation,❌,❌,✅
+Spacing/grid system documentation,❌,❌,✅
+Design system documentation,❌,❌,✅ (complete guide)
+Content strategy development,❌,✅ (basic guidance),✅ (full strategy)
+Messaging framework,❌,❌,✅
+Tone of voice guidelines,❌,✅ (suggestions),✅ (full guidelines)
+SEO content recommendations,❌,✅ (basic),✅ (detailed)
+Content templates,❌,✅,✅ (per page type)
+Content guidance document,❌,✅ (2-3 pages),✅ (full strategy doc)
+Style guide,❌,✅ (basic notes),✅ (complete guide)
+Developer handoff documentation,❌,❌,✅
+Design files (Figma),✅,✅,✅ (organized + specs)
+Client presentations,1,2,3
+Revision rounds,1,2,3
+Client feedback documentation,✅,✅,✅
+Design Phase Subtotal Outputs,2,6,12
+,,,
+PHASE 4: DEVELOPMENT,,,
+Development environment setup,✅,✅,✅
+Staging site URL,✅,✅,✅
+Git repository,✅,✅,✅
+Mosaic™ Framework installation,✅,✅,✅
+Template implementation,4-5 (standard),6-8 (custom),10-15 (fully custom)
+Mosaic™ blocks/components,Standard only,Standard + customized,Advanced custom
+Number of custom blocks,0,5-10,15-30
+Custom functionality,❌,❌ (standard only),✅
+Number of custom features,0,0,3-8
+Advanced custom fields,❌,❌,✅
+Content implementation,Client provides ALL,Client provides (you optimize),Migration OR client provides
+Number of pages content implemented,Up to 12,Up to 25,Unlimited
+Image optimization,✅ (basic),✅ (standard),✅ (full)
+Number of images optimized,Up to 50,Up to 150,Up to 500
+Compliance implementation,✅ (basic),✅ (standard),✅ (full FCA/GDPR)
+Cookie consent,✅,✅,✅
+Privacy policy integration,✅ (link),✅ (link + basic),✅ (full integration)
+Regulatory disclaimers,❌,✅ (basic),✅ (comprehensive)
+Standard integrations,2 (GA4 + form),3-4,5-6
+GA4 integration,✅,✅,✅
+Contact form setup,✅ (1 form),✅ (2-3 forms),✅ (multiple forms)
+Standard plugins integration,✅,✅,✅
+Custom integrations,❌ (add-on only),❌ (add-on only),❌ (add-on - complex)
+Responsive development,Desktop + mobile,Desktop + mobile,Desktop + tablet + mobile
+Internal QA rounds,1,2,3
+Client review rounds (staging),1,2,3
+Revision rounds,1,2,3
+Development documentation,❌,✅ (basic notes),✅ (comprehensive)
+Development Phase Subtotal Outputs,4,5,8
+,,,
+PHASE 5: TESTING,,,
+QA testing,✅,✅,✅
+Browsers tested,"2 (Chrome, Safari)","3 (Chrome, Safari, Edge)",5+
+Devices tested,Mobile + desktop,Mobile + desktop,Mobile + tablet + desktop
+QA report/checklist,✅,✅,✅ (comprehensive)
+Functional testing,✅ (forms + links),✅ (forms + links + interactions),✅ (all functionality)
+Accessibility testing,✅ (automated only),✅ (automated only),✅ (WCAG 2.1 AA full audit)
+Accessibility tools used,Lighthouse,"WAVE, Lighthouse, axe","WAVE, Lighthouse, axe + manual"
+Accessibility report,✅ (basic check),✅ (checklist + remediation),✅ (full audit report)
+Screen reader testing,❌,❌,✅
+Keyboard navigation testing,❌,❌,✅
+Disabled user testing,❌ (add-on),❌ (add-on),❌ (add-on)
+Performance optimization,✅ (standard Mosaic™),✅ (standard + Core Web Vitals),✅ (full optimization <3s target)
+Performance report,✅ (basic check),✅ (metrics),✅ (before/after report)
+Core Web Vitals optimization,❌,✅,✅
+Security implementation,✅ (WordPress standards),✅ (standard hardening),✅ (full hardening + SSL config)
+Security report,❌,❌,✅
+Penetration testing,❌ (add-on),❌ (add-on),❌ (add-on)
+Bug fixes,✅,✅,✅
+Testing Phase Subtotal Outputs,3,5,8
+,,,
+PHASE 6: LAUNCH PREP,,,
+Technical SEO implementation,✅ (basic),✅ (standard),✅ (full)
+Meta tags,✅ (basic),✅ (all pages),✅ (optimized all pages)
+XML sitemap,✅,✅,✅
+Robots.txt,❌,✅,✅
+Schema markup,❌,❌,✅
+301 redirects (if migration),❌,✅,✅
+Number of redirects,0,Up to 50,Up to 500
+SEO documentation,❌,✅ (checklist),✅ (audit + implementation doc)
+Analytics setup,✅ (GA4 code),✅ (GA4 + basic tracking),✅ (GA4 + goals + conversions + events)
+GA4 configuration,✅ (basic),✅ (standard),✅ (advanced)
+Goal/conversion tracking,❌,✅ (basic),✅ (comprehensive)
+Event tracking,❌,❌,✅
+Analytics documentation,❌,✅ (setup notes),✅ (full documentation)
+Mosaic Lens integration,✅,✅,✅
+Mosaic Lens configuration,✅ (basic),✅ (standard),✅ (advanced + custom dashboards)
+Training sessions,1 (30-min walkthrough),1 (1-hour session),1 (2-hour session)
+Training format,Video call,Video call + screen share,Video call + hands-on
+Training materials,✅ (quick start PDF),✅ (quick reference guide),✅ (documentation + video tutorials)
+Mosaic Lens training,✅ (overview),✅ (overview),✅ (full training)
+CMS training,✅ (basic),✅ (standard),✅ (comprehensive)
+Launch plan,❌,❌,✅
+Rollback plan,❌,❌,✅
+Launch runbook,❌,❌,✅
+Launch Prep Phase Subtotal Outputs,3,6,12
+,,,
+PHASE 7: LAUNCH,,,
+Launch type,Standard,Standard,Monitored
+Launch execution,✅,✅,✅
+Post-launch monitoring,❌,24 hours,48 hours
+Launch report,✅ (URL),✅ (checklist),✅ (full report)
+Launch Phase Subtotal Outputs,1,1,1
+,,,
+PHASE 8: POST-LAUNCH,,,
+Bug fix warranty,✅ (7 days),❌ (covered by maintenance),❌ (covered by maintenance)
+Performance review,❌,❌ (add-on),✅ (30-day via Mosaic Lens)
+Performance report,❌,❌,✅ (report + recommendations)
+Optimization recommendations,❌,❌,✅
+Mosaic Lens monitoring,✅ (with maintenance),✅ (with maintenance),✅ (with maintenance)
+Mosaic™ CMS access,✅ (ongoing),✅ (ongoing),✅ (ongoing)
+Post-Launch Phase Subtotal Outputs,1,1,3
+,,,
+TOTAL PROJECT OUTPUTS,20,37,82
+,,,
+ONGOING: HOSTING (SEPARATE),,,
+Recommended hosting package,Bronze (£120/mo),Silver (£180/mo),Gold (£240/mo)
+Staging server (optional),£30/mo,£30/mo (recommended),£30/mo (recommended)
+,,,
+ONGOING: MAINTENANCE (SEPARATE),,,
+Recommended maintenance package,Essential (£280/mo),Advanced (£395/mo),Premium (£510/mo)
+Mosaic Lens included,✅,✅,✅
+,,,
+RECOMMENDED TOTAL MONTHLY,£400-430/mo,£575-605/mo,£750-780/mo
+RECOMMENDED TOTAL ANNUAL,"£4,800-5,160/year","£6,900-7,260/year","£9,000-9,360/year"
