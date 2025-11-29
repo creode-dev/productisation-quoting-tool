@@ -13,9 +13,9 @@ import { ProjectType } from '../types/quote';
  * - Each additional tab has a unique GID
  */
 export const PROJECT_TYPE_SHEET_TABS: Record<ProjectType, string> = {
-  'web-dev': '0',      // Web Development tab (default/first tab)
-  'brand': '0',        // Brand tab - UPDATE THIS with actual GID
-  'campaign': '0'      // Campaign tab - UPDATE THIS with actual GID
+  'web-dev': '2025961483',      // Web Development tab
+  'brand': '1204006534',        // Brand tab
+  'campaign': '215428366'       // Campaign tab
 };
 
 /**
