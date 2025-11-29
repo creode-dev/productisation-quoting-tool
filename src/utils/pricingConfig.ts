@@ -60,14 +60,14 @@ export async function parsePricingConfig(
   }
 
   return new Promise((resolve, reject) => {
-    Papa.parse<PricingItem>(csvText, {
+    Papa.parse<any>(csvText, {
       header: true,
       skipEmptyLines: true,
       complete: (results) => {
         try {
           const items: PricingItem[] = results.data
-            .filter(row => row.Phase && row.Item) // Filter out empty rows
-            .map((row) => {
+            .filter((row: any) => row.Phase && row.Item) // Filter out empty rows
+            .map((row: any) => {
               const ranges = parseRanges(row.Ranges || '');
               
               // Parse question type
@@ -78,7 +78,7 @@ export async function parsePricingConfig(
               
               // Parse options (comma-separated)
               const optionsStr = row.Options || row['Option Labels'] || '';
-              const options = optionsStr.trim() ? optionsStr.split(',').map(opt => opt.trim()).filter(opt => opt) : undefined;
+              const options = optionsStr.trim() ? optionsStr.split(',').map((opt: string) => opt.trim()).filter((opt: string) => opt) : undefined;
               
               // Parse min/max
               const min = row.Min ? parseFloat(String(row.Min)) : undefined;
@@ -115,7 +115,7 @@ export async function parsePricingConfig(
           reject(error);
         }
       },
-      error: (error) => {
+      error: (error: Error) => {
         reject(error);
       }
     });

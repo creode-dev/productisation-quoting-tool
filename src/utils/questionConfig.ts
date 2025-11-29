@@ -1,5 +1,5 @@
 import { Question } from '../types/quote';
-import { PricingItem, getPricingConfig, findPricingItem } from './pricingConfig';
+import { getPricingConfig, findPricingItem } from './pricingConfig';
 
 /**
  * Applies question configuration from pricing config to a question

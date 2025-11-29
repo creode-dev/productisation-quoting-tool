@@ -25,7 +25,7 @@ export async function parseQuestionnaireCSV(filePath: string): Promise<Phase[]> 
           reject(error);
         }
       },
-      error: (error) => {
+      error: (error: Error) => {
         reject(error);
       }
     });

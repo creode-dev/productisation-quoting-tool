@@ -2,7 +2,7 @@ import { PricingTier } from '../types/quote';
 
 interface TierSelectorProps {
   selectedTier: PricingTier | null;
-  onTierSelect: (tier: PricingTier) => void;
+  onTierSelect: (tier: PricingTier | null) => void;
   onPopulate: (tier: PricingTier) => void;
 }
 

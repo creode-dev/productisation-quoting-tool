@@ -5,7 +5,7 @@ import { PhaseSelector } from './PhaseSelector';
 import { PhaseNavigation } from './PhaseNavigation';
 import { TierSelector } from './TierSelector';
 import { ProjectType, PricingTier } from '../types/quote';
-import { getPricingConfig, findPricingItem, onPricingConfigUpdate } from '../utils/pricingConfig';
+import { getPricingConfig, onPricingConfigUpdate } from '../utils/pricingConfig';
 import { buildPhasesFromPricingConfig } from '../utils/phasesFromPricingConfig';
 import { calculatePricing } from '../utils/pricingCalculator';
 
@@ -130,7 +130,7 @@ export function QuoteForm({ showPrices: showPricesProp = false }: QuoteFormProps
     }
   };
 
-  const handleTierSelect = (tier: PricingTier) => {
+  const handleTierSelect = (tier: PricingTier | null) => {
     setSelectedTier(tier);
   };
 
