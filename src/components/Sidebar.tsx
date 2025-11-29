@@ -89,6 +89,7 @@ function NavItem({ node, level = 0 }: { node: DocNode; level?: number }) {
 
 export function Sidebar({ className = '' }: SidebarProps) {
   const { isOpen, toggleSidebar } = useSidebarStore();
+  const location = useLocation();
   const [docTree, setDocTree] = useState<DocNode[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -119,7 +120,7 @@ export function Sidebar({ className = '' }: SidebarProps) {
 
       {/* Sidebar */}
       <aside
-        className={`fixed left-0 top-0 h-full bg-white border-r border-gray-200 z-50 transition-transform duration-300 ease-in-out ${
+        className={`fixed left-0 top-0 h-full bg-white border-r border-gray-200 z-50 transition-all duration-300 ease-in-out ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         } lg:translate-x-0 ${
           isOpen ? 'w-64' : 'w-0 lg:w-16'
@@ -127,13 +128,15 @@ export function Sidebar({ className = '' }: SidebarProps) {
       >
         <div className="h-full flex flex-col">
           {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-gray-200">
-            {isOpen && (
+          <div className="flex items-center justify-between p-4 border-b border-gray-200 min-h-[64px]">
+            {isOpen ? (
               <h2 className="text-lg font-semibold text-gray-900">Navigation</h2>
+            ) : (
+              <div className="w-5 h-5"></div>
             )}
             <button
               onClick={toggleSidebar}
-              className="p-2 hover:bg-gray-100 rounded transition-colors"
+              className="p-2 hover:bg-gray-100 rounded transition-colors flex-shrink-0"
               aria-label="Toggle sidebar"
             >
               <svg
@@ -168,17 +171,31 @@ export function Sidebar({ className = '' }: SidebarProps) {
             ) : (
               <>
                 {isOpen && (
-                  <div className="px-4 pb-2">
-                    <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                      Documentation
-                    </h3>
-                  </div>
+                  <>
+                    {/* Quoting Tool Link */}
+                    <Link
+                      to="/"
+                      className={`block py-2 px-4 text-sm font-medium transition-colors border-b border-gray-200 mb-2 ${
+                        location.pathname === '/' 
+                          ? 'bg-blue-50 text-blue-700 font-semibold border-l-4 border-blue-600' 
+                          : 'text-gray-700 hover:bg-gray-100'
+                      }`}
+                    >
+                      Quoting Tool
+                    </Link>
+                    
+                    <div className="px-4 pb-2 mt-4">
+                      <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                        Documentation
+                      </h3>
+                    </div>
+                    <div>
+                      {docTree.map((node, index) => (
+                        <NavItem key={`${node.path}-${index}`} node={node} />
+                      ))}
+                    </div>
+                  </>
                 )}
-                <div>
-                  {docTree.map((node, index) => (
-                    <NavItem key={`${node.path}-${index}`} node={node} />
-                  ))}
-                </div>
               </>
             )}
           </nav>
