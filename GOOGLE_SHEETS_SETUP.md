@@ -3,6 +3,48 @@
 ## Overview
 The quoting tool can load pricing configuration from a Google Sheet, allowing you to update prices and ranges without redeploying the application.
 
+## Multiple Project Types (Tabs)
+
+The tool supports multiple project types (Web Development, Brand, Campaigns) by using different tabs in your Google Sheet.
+
+### Setting Up Tabs
+
+1. **Create tabs in your Google Sheet**:
+   - Tab 1: "Web Development" (or your preferred name)
+   - Tab 2: "Brand" (or your preferred name)
+   - Tab 3: "Campaign" (or your preferred name)
+
+2. **Find the GID for each tab**:
+   - Click on the tab in Google Sheets
+   - Look at the URL - it will contain `#gid=XXXXXXX`
+   - The number after `gid=` is the GID for that tab
+   - Example: `https://docs.google.com/spreadsheets/d/1jIGuVrI6cPtY-zDLHwV3muej2zi4jjRAnNu8aODr27k/edit#gid=1234567890`
+   - In this case, `1234567890` is the GID
+
+3. **Update the GID mapping**:
+   - Open `src/utils/sheetTabs.ts`
+   - Update the `PROJECT_TYPE_SHEET_TABS` object with your actual GIDs:
+   ```typescript
+   export const PROJECT_TYPE_SHEET_TABS: Record<ProjectType, string> = {
+     'web-dev': '0',      // First tab (GID 0)
+     'brand': '1234567890',    // Your Brand tab GID
+     'campaign': '9876543210'  // Your Campaign tab GID
+   };
+   ```
+
+4. **Each tab should have the same structure**:
+   - Same column headers
+   - Same format
+   - Different data for each project type
+
+### How It Works
+
+- When a user selects "Web Development", the tool loads the first tab (GID 0)
+- When a user selects "Brand", the tool loads the Brand tab (using its GID)
+- When a user selects "Campaign", the tool loads the Campaign tab (using its GID)
+- The pricing config automatically reloads when the project type changes
+- **Important**: The pricing configuration will only load after a project type is selected
+
 ## Setting Up Your Google Sheet
 
 ### 1. Create Your Pricing Sheet

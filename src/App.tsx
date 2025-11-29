@@ -50,6 +50,7 @@ function App() {
         <div className="sticky top-0 z-50">
           <PricingConfigLoader 
             sheetId={GOOGLE_SHEET_ID}
+            projectType={projectType}
             showPrices={showPrices}
             onTogglePrices={() => setShowPrices(!showPrices)}
           />

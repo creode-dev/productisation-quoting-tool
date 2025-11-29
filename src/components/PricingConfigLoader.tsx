@@ -2,14 +2,18 @@ import { useState, useEffect, useCallback } from 'react';
 import { parsePricingConfig } from '../utils/pricingConfig';
 import { setPricingConfig } from '../utils/pricingCalculator';
 
+import { ProjectType } from '../types/quote';
+import { getSheetGidForProjectType } from '../utils/sheetTabs';
+
 interface PricingConfigLoaderProps {
   sheetId?: string;
+  projectType?: ProjectType | null;
   onConfigLoaded?: () => void;
   showPrices: boolean;
   onTogglePrices: () => void;
 }
 
-export function PricingConfigLoader({ sheetId, onConfigLoaded, showPrices, onTogglePrices }: PricingConfigLoaderProps) {
+export function PricingConfigLoader({ sheetId, projectType, onConfigLoaded, showPrices, onTogglePrices }: PricingConfigLoaderProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
@@ -23,7 +27,9 @@ export function PricingConfigLoader({ sheetId, onConfigLoaded, showPrices, onTog
     setError(null);
 
     try {
-      const config = await parsePricingConfig({ sheetId });
+      // Get the appropriate sheet tab (GID) based on project type
+      const gid = getSheetGidForProjectType(projectType || null);
+      const config = await parsePricingConfig({ sheetId, gid });
       setPricingConfig(config);
       setLastUpdated(config.lastUpdated || new Date());
       onConfigLoaded?.();
@@ -34,30 +40,40 @@ export function PricingConfigLoader({ sheetId, onConfigLoaded, showPrices, onTog
     } finally {
       setLoading(false);
     }
-  }, [sheetId, onConfigLoaded]);
+  }, [sheetId, projectType, onConfigLoaded]);
 
   useEffect(() => {
-    if (sheetId) {
+    if (sheetId && projectType) {
       loadConfig();
     }
-  }, [sheetId, loadConfig]);
+  }, [sheetId, projectType, loadConfig]);
 
   // Auto-refresh interval
   useEffect(() => {
-    if (!sheetId || !autoRefresh) return;
+    if (!sheetId || !projectType || !autoRefresh) return;
 
     const interval = setInterval(() => {
       loadConfig();
     }, refreshInterval);
 
     return () => clearInterval(interval);
-  }, [sheetId, autoRefresh, refreshInterval, loadConfig]);
+  }, [sheetId, projectType, autoRefresh, refreshInterval, loadConfig]);
 
   if (!sheetId) {
     return (
       <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
         <p className="text-sm text-yellow-800">
           No Google Sheet ID configured. Please set the sheet ID in the environment or config.
+        </p>
+      </div>
+    );
+  }
+
+  if (!projectType) {
+    return (
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+        <p className="text-sm text-blue-800">
+          Please select a project type to load pricing configuration.
         </p>
       </div>
     );
