@@ -37,8 +37,13 @@ export function QuoteForm({ showPrices: showPricesProp = false }: QuoteFormProps
   const [, forceUpdate] = useState(0); // Force re-render when pricing config updates
   const showPrices = showPricesProp;
 
-  // Load phases from pricing config (Google Sheet)
+  // Load phases from pricing config (Google Sheet) - only when project type is selected
   useEffect(() => {
+    if (!projectType) {
+      setLoading(false);
+      return;
+    }
+
     const loadPhasesFromConfig = () => {
       const pricingConfig = getPricingConfig();
       if (pricingConfig && pricingConfig.items.length > 0) {
@@ -67,7 +72,7 @@ export function QuoteForm({ showPrices: showPricesProp = false }: QuoteFormProps
     });
     
     return unsubscribe;
-  }, [setPhases, setCurrentPhase, setSelectedPhases, currentPhase]);
+  }, [projectType, setPhases, setCurrentPhase, setSelectedPhases, currentPhase]);
 
   // Listen for pricing config updates to rebuild phases and clean up answers
   useEffect(() => {
