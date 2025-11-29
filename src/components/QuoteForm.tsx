@@ -118,12 +118,13 @@ export function QuoteForm({ showPrices: showPricesProp = false }: QuoteFormProps
   }, [setPhases, removeAnswer]);
 
   const handleProjectTypeSelect = (type: ProjectType) => {
+    // Reset everything first, then set the new project type
+    useQuoteStore.getState().reset();
     setProjectType(type);
     setCurrentStep(1);
     // Reset phases and answers when project type changes (will reload from new tab)
     setPhases([]);
     setSelectedPhases([]);
-    useQuoteStore.getState().reset();
     // Clear current phase to trigger reload
     setCurrentPhase(null);
   };
