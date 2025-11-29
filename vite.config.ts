@@ -8,5 +8,12 @@ export default defineConfig({
     port: 5174,
     strictPort: false,
   },
+  publicDir: 'public',
+  // Copy Documentation folder to public for runtime access
+  build: {
+    rollupOptions: {
+      // Ensure markdown files are treated as assets
+    }
+  }
 })
 
