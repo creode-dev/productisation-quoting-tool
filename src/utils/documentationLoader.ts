@@ -110,7 +110,8 @@ export async function getDocFiles(): Promise<string[]> {
   return [
     'Documentation/README.md',
     'Documentation/Process/Discovery.md',
-    'Documentation/Process/Web Development.md'
+    'Documentation/Process/Web Development.md',
+    'Documentation/Quoting/Quoting System Configuration.md'
   ];
 }
 
@@ -154,6 +155,7 @@ export async function loadDocFile(route: string): Promise<string | null> {
       '/docs/readme': '/Documentation/README.md',
       '/docs/process/discovery': '/Documentation/Process/Discovery.md',
       '/docs/process/web-development': '/Documentation/Process/Web Development.md',
+      '/docs/quoting/quoting-system-configuration': '/Documentation/Quoting/Quoting System Configuration.md',
     };
 
     const fallbackPath = knownFiles[route.toLowerCase()];
