@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { employeesAPI, teamsAPI } from '../utils/api';
-import { useEmployeeStore } from '../store/employeeStore';
 
 export function EmployeeManagement() {
   const [employees, setEmployees] = useState<any[]>([]);

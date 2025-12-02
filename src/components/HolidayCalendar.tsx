@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { holidaysAPI } from '../utils/api';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, isSameMonth } from 'date-fns';
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth } from 'date-fns';
 
 interface Holiday {
   id: string;

@@ -9,8 +9,6 @@ import { ProjectType, PricingTier, XeroCompany } from '../types/quote';
 import { getPricingConfig, onPricingConfigUpdate } from '../utils/pricingConfig';
 import { buildPhasesFromPricingConfig } from '../utils/phasesFromPricingConfig';
 import { calculatePricing } from '../utils/pricingCalculator';
-import { useQuotesStore } from '../store/quotesStore';
-import { buildQuote } from '../utils/quoteBuilder';
 
 interface QuoteFormProps {
   showPrices?: boolean;
@@ -26,7 +24,6 @@ export function QuoteForm({ showPrices: showPricesProp = false }: QuoteFormProps
     phases,
     selectedTier,
     companyName,
-    companyXeroId,
     projectName,
     businessUnit,
     targetCompletionDate,
@@ -46,8 +43,6 @@ export function QuoteForm({ showPrices: showPricesProp = false }: QuoteFormProps
     setTargetCompletionDate,
     populateFromTier
   } = useQuoteStore();
-  
-  const { saveQuote } = useQuotesStore();
 
   const [loading, setLoading] = useState(true);
   const [, forceUpdate] = useState(0); // Force re-render when pricing config updates
@@ -144,28 +139,6 @@ export function QuoteForm({ showPrices: showPricesProp = false }: QuoteFormProps
     setSelectedPhases([]);
     // Clear current phase to trigger reload
     setCurrentPhase(null);
-  };
-  
-  const handleSaveQuote = async () => {
-    if (!companyName || !projectName || !projectType || selectedPhases.length === 0) {
-      alert('Please fill in all required fields and complete the quote');
-      return;
-    }
-    
-    try {
-      const quote = buildQuote(projectType, answers, phases, selectedPhases, sharedVariables);
-      await saveQuote({
-        companyName,
-        companyXeroId: companyXeroId || undefined,
-        projectName,
-        businessUnit: businessUnit || undefined,
-        targetCompletionDate: targetCompletionDate || undefined,
-        quoteData: quote,
-      });
-      alert('Quote saved successfully!');
-    } catch (error: any) {
-      alert(error.message || 'Failed to save quote');
-    }
   };
   
   const handleCompanySelect = (company: XeroCompany | null) => {

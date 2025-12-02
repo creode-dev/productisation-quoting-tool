@@ -19,7 +19,7 @@ export function CompanyAutocomplete({
   const [companies, setCompanies] = useState<XeroCompany[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [selectedCompany, setSelectedCompany] = useState<XeroCompany | null>(null);
+  const [_selectedCompany, setSelectedCompany] = useState<XeroCompany | null>(null);
   const debounceTimer = useRef<NodeJS.Timeout | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);

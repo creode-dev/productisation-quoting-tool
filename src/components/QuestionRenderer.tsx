@@ -241,7 +241,7 @@ export function QuestionRenderer({ question, answer, onChange, phaseName, showPr
       };
 
       // Create a temporary answer for price calculation
-      const tempAnswer: Answer = { questionId: question.id, value: value };
+      const tempAnswer: Answer = { questionId: question.id, value: value ?? '' };
       const price = showPrices ? calculateQuestionPrice(configuredQuestion, tempAnswer, phaseName) : 0;
       
       // If this is a shared variable reference, show read-only display with edit button
@@ -423,7 +423,7 @@ export function QuestionRenderer({ question, answer, onChange, phaseName, showPr
       };
 
       // Create a temporary answer for price calculation
-      const tempAnswer: Answer = { questionId: question.id, value: value };
+      const tempAnswer: Answer = { questionId: question.id, value: value ?? '' };
       const price = showPrices ? calculateQuestionPrice(configuredQuestion, tempAnswer, phaseName) : 0;
       
       // If this is a shared variable reference, show read-only display with edit button

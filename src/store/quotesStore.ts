@@ -20,7 +20,7 @@ interface QuotesStore {
   clearError: () => void;
 }
 
-export const useQuotesStore = create<QuotesStore>((set, get) => ({
+export const useQuotesStore = create<QuotesStore>((set) => ({
   quotes: [],
   loading: false,
   error: null,

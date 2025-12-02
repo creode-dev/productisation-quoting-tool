@@ -29,7 +29,7 @@ interface EmployeeStore {
   reset: () => void;
 }
 
-export const useEmployeeStore = create<EmployeeStore>((set, get) => ({
+export const useEmployeeStore = create<EmployeeStore>((set) => ({
   employee: null,
   loading: false,
   error: null,

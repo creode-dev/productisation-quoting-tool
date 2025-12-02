@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuotesStore } from '../store/quotesStore';
-import { SavedQuote, QuoteStatus } from '../types/quote';
+import { QuoteStatus } from '../types/quote';
 import { format } from 'date-fns';
 
 const statusColors: Record<QuoteStatus, string> = {
