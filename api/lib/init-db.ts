@@ -2,7 +2,7 @@
 // Run this once to set up the database schema
 // You can call this from a Vercel serverless function or run it manually
 
-import { sql, initDatabase } from './db';
+import { initDatabase } from './db';
 
 export default async function handler() {
   try {

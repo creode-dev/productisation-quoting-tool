@@ -10,8 +10,8 @@ function getTenantIds(): string[] {
   return XERO_TENANT_ID.split(',').map(id => id.trim()).filter(id => id.length > 0);
 }
 
-interface XeroTokenResponse {
-  access_token: string;
+// interface XeroTokenResponse {
+//   access_token: string;
   token_type: string;
   expires_in: number;
 }
