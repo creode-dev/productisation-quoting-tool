@@ -5,6 +5,14 @@ import { QuoteState, ProjectType, Answer, Phase, PricingTier } from '../types/qu
 interface QuoteStore extends QuoteState {
   phases: Phase[];
   selectedTier: PricingTier | null;
+  // Quote metadata
+  companyName: string;
+  companyXeroId: string | null;
+  projectName: string;
+  businessUnit: string;
+  targetCompletionDate: string;
+  // Shared variables (values that can be referenced across phases)
+  sharedVariables: Record<string, number | string | boolean>;
   setPhases: (phases: Phase[]) => void;
   setProjectType: (type: ProjectType) => void;
   setSelectedPhases: (phaseIds: string[]) => void;
@@ -13,6 +21,12 @@ interface QuoteStore extends QuoteState {
   setCurrentPhase: (phaseId: string | null) => void;
   setCurrentStep: (step: number) => void;
   setSelectedTier: (tier: PricingTier | null) => void;
+  setCompanyName: (name: string) => void;
+  setCompanyXeroId: (id: string | null) => void;
+  setProjectName: (name: string) => void;
+  setBusinessUnit: (unit: string) => void;
+  setTargetCompletionDate: (date: string) => void;
+  setSharedVariable: (name: string, value: number | string | boolean) => void;
   populateFromTier: (tier: PricingTier) => void;
   reset: () => void;
 }
@@ -25,12 +39,23 @@ const initialState: QuoteState = {
   currentStep: 0
 };
 
+const initialMetadata = {
+  companyName: '',
+  companyXeroId: null as string | null,
+  projectName: '',
+  businessUnit: '',
+  targetCompletionDate: '',
+  sharedVariables: {} as Record<string, number | string | boolean>,
+};
+
 export const useQuoteStore = create<QuoteStore>()(
   persist(
     (set, get) => ({
       ...initialState,
+      ...initialMetadata,
       phases: [],
       selectedTier: null,
+      sharedVariables: {},
       
       setPhases: (phases) => set({ phases }),
       
@@ -47,12 +72,30 @@ export const useQuoteStore = create<QuoteStore>()(
       
       setSelectedPhases: (phaseIds) => set({ selectedPhases: phaseIds }),
       
-      setAnswer: (questionId, value) => set((state) => ({
-        answers: {
-          ...state.answers,
-          [questionId]: { questionId, value }
+      setAnswer: (questionId, value) => set((state) => {
+        // Find the question to check if it's a shared variable definition
+        let sharedVarName: string | undefined;
+        for (const phase of state.phases) {
+          const question = phase.questions.find(q => q.id === questionId);
+          if (question?.isSharedVariable && question.sharedVariableName) {
+            sharedVarName = question.sharedVariableName;
+            break;
+          }
         }
-      })),
+        
+        // Update shared variable if this question defines one
+        const newSharedVariables = sharedVarName
+          ? { ...state.sharedVariables, [sharedVarName]: value }
+          : state.sharedVariables;
+        
+        return {
+          answers: {
+            ...state.answers,
+            [questionId]: { questionId, value }
+          },
+          sharedVariables: newSharedVariables
+        };
+      }),
       
       removeAnswer: (questionId) => set((state) => {
         const newAnswers = { ...state.answers };
@@ -65,6 +108,19 @@ export const useQuoteStore = create<QuoteStore>()(
       setCurrentStep: (step) => set({ currentStep: step }),
       
       setSelectedTier: (tier) => set({ selectedTier: tier }),
+      
+      setCompanyName: (name) => set({ companyName: name }),
+      setCompanyXeroId: (id) => set({ companyXeroId: id }),
+      setProjectName: (name) => set({ projectName: name }),
+      setBusinessUnit: (unit) => set({ businessUnit: unit }),
+      setTargetCompletionDate: (date) => set({ targetCompletionDate: date }),
+      
+      setSharedVariable: (name, value) => set((state) => ({
+        sharedVariables: {
+          ...state.sharedVariables,
+          [name]: value
+        }
+      })),
       
       populateFromTier: (tier) => {
         const state = get();
@@ -83,7 +139,7 @@ export const useQuoteStore = create<QuoteStore>()(
         set({ answers: newAnswers, selectedTier: tier });
       },
       
-      reset: () => set({ ...initialState, phases: [], selectedTier: null })
+      reset: () => set({ ...initialState, ...initialMetadata, phases: [], selectedTier: null, sharedVariables: {} })
     }),
     {
       name: 'quote-storage',

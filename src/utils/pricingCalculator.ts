@@ -148,7 +148,8 @@ export function determineTier(answers: Record<string, Answer>, phases: Phase[]):
 export function calculatePricing(
   answers: Record<string, Answer>,
   phases: Phase[],
-  selectedPhaseIds: string[]
+  selectedPhaseIds: string[],
+  sharedVariables?: Record<string, number | string | boolean>
 ): PhasePricing[] {
   const tier = determineTier(answers, phases);
   const phasePricing: PhasePricing[] = [];
@@ -159,11 +160,33 @@ export function calculatePricing(
     const items: PricingItem[] = [];
     
     for (const question of phase.questions) {
-      const answer = answers[question.id];
-      if (!answer) continue;
+      // Check if question references a shared variable
+      let resolvedValue: number | string | boolean | undefined;
+      let quantity: number;
       
-      // Skip if binary and not selected
-      if (question.type === 'binary' && !answer.value) continue;
+      if (question.referencesSharedVariable && sharedVariables) {
+        // Use shared variable value instead of answer
+        resolvedValue = sharedVariables[question.referencesSharedVariable];
+        if (resolvedValue === undefined) {
+          // Shared variable not set yet, skip this question
+          continue;
+        }
+        quantity = typeof resolvedValue === 'number' 
+          ? resolvedValue 
+          : (typeof resolvedValue === 'boolean' ? 1 : (parseInt(String(resolvedValue), 10) || 1));
+      } else {
+        // Use regular answer
+        const answer = answers[question.id];
+        if (!answer) continue;
+        
+        // Skip if binary and not selected
+        if (question.type === 'binary' && !answer.value) continue;
+        
+        resolvedValue = answer.value;
+        quantity = typeof answer.value === 'number' 
+          ? answer.value 
+          : (question.type === 'binary' ? 1 : (parseInt(String(answer.value), 10) || 1));
+      }
       
       // Only process questions that exist in pricing config
       if (pricingConfig) {
@@ -174,10 +197,9 @@ export function calculatePricing(
         }
       }
       
-      const unitPrice = calculateQuestionPrice(question, answer, phase.name, tier);
-      const quantity = typeof answer.value === 'number' 
-        ? answer.value 
-        : (question.type === 'binary' ? 1 : (parseInt(String(answer.value), 10) || 1));
+      // Create a temporary answer object for price calculation
+      const tempAnswer: Answer = { questionId: question.id, value: resolvedValue };
+      const unitPrice = calculateQuestionPrice(question, tempAnswer, phase.name, tier);
       
       // Calculate total price
       let total: number;

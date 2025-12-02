@@ -1,0 +1,6 @@
+Configuration Error
+Google Client ID is not configured. Please set VITE_GOOGLE_CLIENT_ID.
+  "setup-worktree": [
+    "npm install"
+  ]
+}

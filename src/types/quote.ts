@@ -4,6 +4,8 @@ export type QuestionType = 'binary' | 'number' | 'select' | 'range' | 'text';
 
 export type PricingTier = 'essential' | 'refresh' | 'transformation';
 
+export type QuoteStatus = 'draft' | 'sent' | 'accepted' | 'rejected';
+
 export interface QuestionOption {
   value: string;
   label: string;
@@ -32,6 +34,10 @@ export interface Question {
     refresh: string;
     transformation: string;
   };
+  // Shared variable fields
+  isSharedVariable?: boolean; // True if this question defines a shared variable
+  sharedVariableName?: string; // Name of the shared variable (without brackets) if this defines one
+  referencesSharedVariable?: string; // Name of the shared variable (without brackets) if this references one
 }
 
 export interface Phase {
@@ -98,5 +104,35 @@ export interface Quote {
   total: number;
   timeline: string;
   createdAt: Date;
+  // Extended fields for saved quotes
+  id?: string;
+  companyName?: string;
+  companyXeroId?: string;
+  projectName?: string;
+  businessUnit?: string;
+  targetCompletionDate?: string;
+  status?: QuoteStatus;
 }
 
+export interface SavedQuote {
+  id: string;
+  userId: string;
+  companyName: string;
+  companyXeroId?: string;
+  projectName: string;
+  businessUnit?: string;
+  targetCompletionDate?: string;
+  quoteData: Quote;
+  status: QuoteStatus;
+  createdAt: string;
+  updatedAt: string;
+  acceptedAt?: string;
+  acceptedBy?: string;
+}
+
+export interface XeroCompany {
+  ContactID: string;
+  Name: string;
+  ContactStatus?: string;
+  EmailAddress?: string;
+}

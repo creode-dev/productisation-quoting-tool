@@ -5,10 +5,11 @@ export function buildQuote(
   projectType: ProjectType,
   answers: Record<string, Answer>,
   phases: Phase[],
-  selectedPhaseIds: string[]
+  selectedPhaseIds: string[],
+  sharedVariables?: Record<string, number | string | boolean>
 ): Quote {
   const tier = determineTier(answers, phases);
-  const phasePricing = calculatePricing(answers, phases, selectedPhaseIds);
+  const phasePricing = calculatePricing(answers, phases, selectedPhaseIds, sharedVariables);
   
   // Separate add-ons from regular items
   const addOns = phasePricing

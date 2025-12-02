@@ -21,6 +21,7 @@ export interface PricingItem {
   max?: number; // Maximum value for number/range questions
   required?: boolean; // Whether question is required
   validation?: string; // Additional validation rules (e.g., "integer", "positive", "email")
+  sharedVariable?: string; // Shared variable name (e.g., "components") or reference (e.g., "{components}")
 }
 
 export interface PricingConfig {
@@ -88,6 +89,10 @@ export async function parsePricingConfig(
               const requiredStr = (row.Required || row['Is Required'] || '').toString().toLowerCase();
               const required = requiredStr === 'true' || requiredStr === '1' || requiredStr === 'yes' || requiredStr === 'y';
               
+              // Parse shared variable (can be a variable name like "components" or a reference like "{components}")
+              const sharedVarStr = (row['Shared Variable'] || row['SharedVariable'] || '').trim();
+              const sharedVariable = sharedVarStr ? sharedVarStr : undefined;
+              
               return {
                 phase: row.Phase.trim(),
                 item: row.Item.trim(),
@@ -102,7 +107,8 @@ export async function parsePricingConfig(
                 min: isNaN(min!) ? undefined : min,
                 max: isNaN(max!) ? undefined : max,
                 required: required || undefined,
-                validation: row.Validation?.trim() || undefined
+                validation: row.Validation?.trim() || undefined,
+                sharedVariable
               };
             });
 

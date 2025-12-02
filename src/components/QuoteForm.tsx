@@ -4,10 +4,13 @@ import { QuestionRenderer } from './QuestionRenderer';
 import { PhaseSelector } from './PhaseSelector';
 import { PhaseNavigation } from './PhaseNavigation';
 import { TierSelector } from './TierSelector';
-import { ProjectType, PricingTier } from '../types/quote';
+import { CompanyAutocomplete } from './CompanyAutocomplete';
+import { ProjectType, PricingTier, XeroCompany } from '../types/quote';
 import { getPricingConfig, onPricingConfigUpdate } from '../utils/pricingConfig';
 import { buildPhasesFromPricingConfig } from '../utils/phasesFromPricingConfig';
 import { calculatePricing } from '../utils/pricingCalculator';
+import { useQuotesStore } from '../store/quotesStore';
+import { buildQuote } from '../utils/quoteBuilder';
 
 interface QuoteFormProps {
   showPrices?: boolean;
@@ -22,6 +25,12 @@ export function QuoteForm({ showPrices: showPricesProp = false }: QuoteFormProps
     currentStep,
     phases,
     selectedTier,
+    companyName,
+    companyXeroId,
+    projectName,
+    businessUnit,
+    targetCompletionDate,
+    sharedVariables,
     setPhases,
     setProjectType,
     setSelectedPhases,
@@ -30,8 +39,15 @@ export function QuoteForm({ showPrices: showPricesProp = false }: QuoteFormProps
     setCurrentPhase,
     setCurrentStep,
     setSelectedTier,
+    setCompanyName,
+    setCompanyXeroId,
+    setProjectName,
+    setBusinessUnit,
+    setTargetCompletionDate,
     populateFromTier
   } = useQuoteStore();
+  
+  const { saveQuote } = useQuotesStore();
 
   const [loading, setLoading] = useState(true);
   const [, forceUpdate] = useState(0); // Force re-render when pricing config updates
@@ -122,12 +138,44 @@ export function QuoteForm({ showPrices: showPricesProp = false }: QuoteFormProps
     // Reset everything first, then set the new project type
     useQuoteStore.getState().reset();
     setProjectType(type);
-    setCurrentStep(1);
+    setCurrentStep(0.5); // Go to company/project info step
     // Reset phases and answers when project type changes (will reload from new tab)
     setPhases([]);
     setSelectedPhases([]);
     // Clear current phase to trigger reload
     setCurrentPhase(null);
+  };
+  
+  const handleSaveQuote = async () => {
+    if (!companyName || !projectName || !projectType || selectedPhases.length === 0) {
+      alert('Please fill in all required fields and complete the quote');
+      return;
+    }
+    
+    try {
+      const quote = buildQuote(projectType, answers, phases, selectedPhases, sharedVariables);
+      await saveQuote({
+        companyName,
+        companyXeroId: companyXeroId || undefined,
+        projectName,
+        businessUnit: businessUnit || undefined,
+        targetCompletionDate: targetCompletionDate || undefined,
+        quoteData: quote,
+      });
+      alert('Quote saved successfully!');
+    } catch (error: any) {
+      alert(error.message || 'Failed to save quote');
+    }
+  };
+  
+  const handleCompanySelect = (company: XeroCompany | null) => {
+    if (company) {
+      setCompanyName(company.Name);
+      setCompanyXeroId(company.ContactID);
+    } else {
+      setCompanyName('');
+      setCompanyXeroId(null);
+    }
   };
 
   const handleStartOver = () => {
@@ -167,7 +215,7 @@ export function QuoteForm({ showPrices: showPricesProp = false }: QuoteFormProps
   const currentIndex = visiblePhases.findIndex(p => p.id === currentPhase);
   
   // Calculate phase total for current phase
-  const phasePricing = calculatePricing(answers, phases, selectedPhases);
+  const phasePricing = calculatePricing(answers, phases, selectedPhases, sharedVariables);
   const currentPhaseTotal = currentPhaseData 
     ? phasePricing.find(p => p.phaseId === currentPhaseData.id)?.subtotal || 0
     : 0;
@@ -257,6 +305,106 @@ export function QuoteForm({ showPrices: showPricesProp = false }: QuoteFormProps
     );
   }
 
+  // Step 0.5: Company/Project Information
+  if (projectType && currentStep === 0.5) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex justify-end mb-4">
+            <button
+              onClick={handleStartOver}
+              className="text-sm text-gray-600 hover:text-gray-900 font-medium flex items-center space-x-1"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+              </svg>
+              <span>Start Over</span>
+            </button>
+          </div>
+          
+          <div className="bg-white rounded-xl shadow-lg p-10">
+            <h1 className="text-4xl font-bold text-gray-900 mb-3">Quote Information</h1>
+            <p className="text-lg text-gray-600 mb-10">Enter company and project details</p>
+            
+            <div className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Company <span className="text-red-500">*</span>
+                </label>
+                <CompanyAutocomplete
+                  value={companyName}
+                  onChange={handleCompanySelect}
+                  placeholder="Search for a company..."
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Project Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={projectName}
+                  onChange={(e) => setProjectName(e.target.value)}
+                  placeholder="Enter project name"
+                  required
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Business Unit (Optional)
+                </label>
+                <input
+                  type="text"
+                  value={businessUnit}
+                  onChange={(e) => setBusinessUnit(e.target.value)}
+                  placeholder="Enter business unit"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Target Completion Date
+                </label>
+                <input
+                  type="date"
+                  value={targetCompletionDate}
+                  onChange={(e) => setTargetCompletionDate(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+            
+            <div className="mt-8 flex justify-end gap-4">
+              <button
+                onClick={() => setCurrentStep(0)}
+                className="px-6 py-3 text-lg font-semibold bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+              >
+                Back
+              </button>
+              <button
+                onClick={() => {
+                  if (!companyName || !projectName) {
+                    alert('Please fill in company and project name');
+                    return;
+                  }
+                  setCurrentStep(1);
+                }}
+                className="px-8 py-3 text-lg font-semibold bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-md"
+              >
+                Continue to Phases →
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // Step 1: Phase Selection (after project type)
   if (currentStep === 1) {
     return (
@@ -295,7 +443,13 @@ export function QuoteForm({ showPrices: showPricesProp = false }: QuoteFormProps
             />
           </div>
           
-          <div className="mt-8 flex justify-end">
+          <div className="mt-8 flex justify-end gap-4">
+            <button
+              onClick={() => setCurrentStep(0.5)}
+              className="px-6 py-3 text-lg font-semibold bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors"
+            >
+              Back
+            </button>
             <button
               onClick={() => {
                 setCurrentStep(2);

@@ -22,20 +22,35 @@ npx vercel link
 
 #### Production Environment
 ```bash
+# Google Sheet ID
 npx vercel env add VITE_GOOGLE_SHEET_ID production
 # Enter: 1jIGuVrI6cPtY-zDLHwV3muej2zi4jjRAnNu8aODr27k
+
+# Google OAuth Client ID (for authentication)
+npx vercel env add VITE_GOOGLE_CLIENT_ID production
+# Enter: Your Google OAuth Client ID (see SETUP.md for instructions)
 ```
 
 #### Preview/Staging Environment
 ```bash
+# Google Sheet ID
 npx vercel env add VITE_GOOGLE_SHEET_ID preview
 # Enter: 1jIGuVrI6cPtY-zDLHwV3muej2zi4jjRAnNu8aODr27k
+
+# Google OAuth Client ID
+npx vercel env add VITE_GOOGLE_CLIENT_ID preview
+# Enter: Your Google OAuth Client ID
 ```
 
 #### Development Environment
 ```bash
+# Google Sheet ID
 npx vercel env add VITE_GOOGLE_SHEET_ID development
 # Enter: 1jIGuVrI6cPtY-zDLHwV3muej2zi4jjRAnNu8aODr27k
+
+# Google OAuth Client ID
+npx vercel env add VITE_GOOGLE_CLIENT_ID development
+# Enter: Your Google OAuth Client ID
 ```
 
 ### Step 4: Deploy to Production
@@ -58,10 +73,13 @@ npx vercel
    - **Root Directory**: `./`
    - **Build Command**: `npm run build`
    - **Output Directory**: `dist`
-5. Add Environment Variable:
+5. Add Environment Variables:
    - **Name**: `VITE_GOOGLE_SHEET_ID`
-   - **Value**: `1jIGuVrI6cPtY-zDLHwV3muej2zi4jjRAnNu8aODr27k`
-   - Add to: Production, Preview, and Development
+     - **Value**: `1jIGuVrI6cPtY-zDLHwV3muej2zi4jjRAnNu8aODr27k`
+     - Add to: Production, Preview, and Development
+   - **Name**: `VITE_GOOGLE_CLIENT_ID`
+     - **Value**: Your Google OAuth Client ID (see SETUP.md for instructions)
+     - Add to: Production, Preview, and Development
 6. Click "Deploy"
 
 ## Setting Up Staging Environment
@@ -98,4 +116,5 @@ After deployment, you'll get:
 - Environment variables are set in Vercel dashboard or via CLI
 - Each environment (production, preview, development) can have different values
 - The Google Sheet must be publicly accessible for the tool to work
+- **Important**: For Google OAuth, you don't need to enable any specific API. Google Identity Services works by default with OAuth 2.0 credentials.
 

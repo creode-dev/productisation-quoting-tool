@@ -22,14 +22,20 @@ export type DocNode = DocFile | DocFolder;
 
 /**
  * Converts a file path to a URL-friendly route
+ * Preserves folder structure by converting each part separately
  */
 function pathToRoute(path: string): string {
   return path
     .replace(/^Documentation\//, '')
     .replace(/\.md$/, '')
-    .toLowerCase()
-    .replace(/\s+/g, '-')
-    .replace(/[^a-z0-9-]/g, '');
+    .split('/')
+    .map(part => 
+      part
+        .toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/[^a-z0-9-]/g, '')
+    )
+    .join('/');
 }
 
 /**
@@ -111,7 +117,13 @@ export async function getDocFiles(): Promise<string[]> {
     'Documentation/README.md',
     'Documentation/Process/Discovery.md',
     'Documentation/Process/Web Development.md',
-    'Documentation/Quoting/Quoting System Configuration.md'
+    'Documentation/Settings/Authentication Setup.md',
+    'Documentation/Settings/Database Setup.md',
+    'Documentation/Settings/Quoting System Configuration.md',
+    'Documentation/Settings/Xero API Setup.md',
+    'Documentation/Settings/Creode Team Portal Setup.md',
+    'Documentation/User Guides/Quoting Tool User Guide.md',
+    'Documentation/User Guides/Creode Team Portal User Guide.md'
   ];
 }
 
@@ -120,18 +132,50 @@ export async function getDocFiles(): Promise<string[]> {
  */
 export async function loadDocFile(route: string): Promise<string | null> {
   try {
-    // Convert route back to file path
-    // Route format: /docs/process/discovery
-    const pathParts = route
-      .replace(/^\/docs\//, '')
-      .split('/')
-      .map(part => {
-        // Convert kebab-case back to Title Case
-        return part
-          .split('-')
-          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-          .join(' ');
-      });
+    // First, try the known files mapping (most reliable)
+    const knownFiles: Record<string, string> = {
+      '/docs/readme': '/Documentation/README.md',
+      '/docs/process/discovery': '/Documentation/Process/Discovery.md',
+      '/docs/process/web-development': '/Documentation/Process/Web Development.md',
+      '/docs/settings/authentication-setup': '/Documentation/Settings/Authentication Setup.md',
+      '/docs/settings/database-setup': '/Documentation/Settings/Database Setup.md',
+      '/docs/settings/quoting-system-configuration': '/Documentation/Settings/Quoting System Configuration.md',
+      '/docs/settings/xero-api-setup': '/Documentation/Settings/Xero API Setup.md',
+      '/docs/settings/creode-team-portal-setup': '/Documentation/Settings/Creode Team Portal Setup.md',
+      '/docs/user-guides/quoting-tool-user-guide': '/Documentation/User Guides/Quoting Tool User Guide.md',
+      '/docs/user-guides/creode-team-portal-user-guide': '/Documentation/User Guides/Creode Team Portal User Guide.md',
+    };
+
+    const normalizedRoute = route.toLowerCase();
+    const fallbackPath = knownFiles[normalizedRoute];
+    
+    if (fallbackPath) {
+      try {
+        const response = await fetch(fallbackPath);
+        if (response.ok) {
+          const text = await response.text();
+          // Check if we got HTML instead of markdown (SPA fallback)
+          if (text.trim().startsWith('<!doctype html>') || text.trim().startsWith('<!DOCTYPE html>')) {
+            console.error('Received HTML instead of markdown for:', fallbackPath);
+            return null;
+          }
+          return text;
+        }
+      } catch (fetchError) {
+        console.error('Error fetching known file:', fetchError);
+      }
+    }
+
+    // Fallback: try to convert route to file path
+    // Route format: /docs/process/discovery or /docs/quoting/quoting-system-configuration
+    const routeWithoutPrefix = route.replace(/^\/docs\//, '');
+    const pathParts = routeWithoutPrefix.split('/').map(part => {
+      // Convert kebab-case back to Title Case
+      return part
+        .split('-')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+    });
 
     // Build file path
     const fileName = pathParts[pathParts.length - 1] + '.md';
@@ -144,26 +188,16 @@ export async function loadDocFile(route: string): Promise<string | null> {
     try {
       const response = await fetch(filePath);
       if (response.ok) {
-        return await response.text();
+        const text = await response.text();
+        // Check if we got HTML instead of markdown (SPA fallback)
+        if (text.trim().startsWith('<!doctype html>') || text.trim().startsWith('<!DOCTYPE html>')) {
+          console.error('Received HTML instead of markdown for:', filePath);
+          return null;
+        }
+        return text;
       }
     } catch (fetchError) {
       console.error('Error fetching doc file:', fetchError);
-    }
-
-    // Fallback: try to match known files
-    const knownFiles: Record<string, string> = {
-      '/docs/readme': '/Documentation/README.md',
-      '/docs/process/discovery': '/Documentation/Process/Discovery.md',
-      '/docs/process/web-development': '/Documentation/Process/Web Development.md',
-      '/docs/quoting/quoting-system-configuration': '/Documentation/Quoting/Quoting System Configuration.md',
-    };
-
-    const fallbackPath = knownFiles[route.toLowerCase()];
-    if (fallbackPath) {
-      const response = await fetch(fallbackPath);
-      if (response.ok) {
-        return await response.text();
-      }
     }
 
     return null;

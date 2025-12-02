@@ -21,11 +21,14 @@ export function DocumentationPage() {
       setError(null);
 
       try {
-        const docContent = await loadDocFile(`/docs/${path}`);
+        const fullRoute = `/docs/${path}`;
+        console.log('Loading documentation from route:', fullRoute);
+        const docContent = await loadDocFile(fullRoute);
         if (docContent) {
           setContent(docContent);
         } else {
-          setError('Documentation not found');
+          console.error('Documentation not found for route:', fullRoute);
+          setError(`Documentation not found: ${path}`);
         }
       } catch (err) {
         console.error('Error loading documentation:', err);

@@ -84,6 +84,24 @@ function buildQuestionFromPricingItem(item: PricingItem, phaseOrder: number): Qu
     };
   }
   
+  // Parse shared variable configuration
+  let isSharedVariable = false;
+  let sharedVariableName: string | undefined;
+  let referencesSharedVariable: string | undefined;
+  
+  if (item.sharedVariable) {
+    const sharedVar = item.sharedVariable.trim();
+    // Check if it's a reference (starts with { and ends with })
+    if (sharedVar.startsWith('{') && sharedVar.endsWith('}')) {
+      // Extract variable name from {variableName}
+      referencesSharedVariable = sharedVar.slice(1, -1).trim();
+    } else {
+      // It's a definition - this question defines a shared variable
+      isSharedVariable = true;
+      sharedVariableName = sharedVar;
+    }
+  }
+  
   const question: Question = {
     id: questionId,
     label: item.item,
@@ -92,7 +110,10 @@ function buildQuestionFromPricingItem(item: PricingItem, phaseOrder: number): Qu
     tierValues,
     helpText: item.description,
     min: item.min,
-    max: item.max
+    max: item.max,
+    isSharedVariable,
+    sharedVariableName,
+    referencesSharedVariable
   };
   
   // Set type-specific properties

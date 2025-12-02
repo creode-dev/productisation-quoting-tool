@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { Question, Answer } from '../types/quote';
 import { getPricingConfig, findPricingItem, onPricingConfigUpdate, calculateItemPrice } from '../utils/pricingConfig';
 import { applyQuestionConfig } from '../utils/questionConfig';
+import { useQuoteStore } from '../store/quoteStore';
+import { SharedVariableEditor } from './SharedVariableEditor';
 
 interface QuestionRendererProps {
   question: Question;
@@ -65,6 +67,8 @@ function calculateQuestionPrice(
 export function QuestionRenderer({ question, answer, onChange, phaseName, showPrices = false }: QuestionRendererProps) {
   // Force re-render when pricing config updates
   const [, forceUpdate] = useState(0);
+  const { sharedVariables, setSharedVariable } = useQuoteStore();
+  const [isEditorOpen, setIsEditorOpen] = useState(false);
   
   useEffect(() => {
     const unsubscribe = onPricingConfigUpdate(() => {
@@ -76,7 +80,41 @@ export function QuestionRenderer({ question, answer, onChange, phaseName, showPr
   // Questions are now built directly from pricing config, so they're already configured
   // But we can still apply any runtime updates if needed
   const configuredQuestion = phaseName ? applyQuestionConfig(question, phaseName) : question;
-  const value = answer?.value ?? configuredQuestion.defaultValue;
+  
+  // Check if question references a shared variable
+  const sharedVarName = question.referencesSharedVariable || (question.isSharedVariable ? question.sharedVariableName : undefined);
+  const sharedVarValue = sharedVarName ? sharedVariables[sharedVarName] : undefined;
+  const isSharedVarReference = !!question.referencesSharedVariable;
+  const isSharedVarDefinition = !!question.isSharedVariable;
+  const hasSharedVarValue = sharedVarValue !== undefined;
+  
+  // Determine the value to display/use
+  let value: string | number | boolean | undefined;
+  if (isSharedVarReference && hasSharedVarValue) {
+    // Use shared variable value (question references a shared variable)
+    value = sharedVarValue;
+  } else if (isSharedVarReference && !hasSharedVarValue) {
+    // Shared variable not set yet - don't show this question (or show a message)
+    // For now, we'll skip rendering if the variable isn't set
+    return null;
+  } else if (isSharedVarDefinition && hasSharedVarValue) {
+    // Question defines a shared variable and it's already set - use shared value
+    value = sharedVarValue;
+  } else {
+    // Regular question or shared variable definition not yet set - use answer or default
+    value = answer?.value ?? configuredQuestion.defaultValue;
+  }
+  
+  const handleEditSharedVariable = () => {
+    setIsEditorOpen(true);
+  };
+  
+  const handleSaveSharedVariable = (newValue: number | string | boolean) => {
+    if (sharedVarName) {
+      setSharedVariable(sharedVarName, newValue);
+    }
+    setIsEditorOpen(false);
+  };
 
   switch (configuredQuestion.type) {
     case 'binary': {
@@ -202,7 +240,59 @@ export function QuestionRenderer({ question, answer, onChange, phaseName, showPr
         }
       };
 
-      const price = showPrices ? calculateQuestionPrice(configuredQuestion, answer, phaseName) : 0;
+      // Create a temporary answer for price calculation
+      const tempAnswer: Answer = { questionId: question.id, value: value };
+      const price = showPrices ? calculateQuestionPrice(configuredQuestion, tempAnswer, phaseName) : 0;
+      
+      // If this is a shared variable reference, show read-only display with edit button
+      if (isSharedVarReference && hasSharedVarValue) {
+        return (
+          <>
+            <div className="py-3">
+              <div className="flex items-start justify-between mb-2">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <label htmlFor={question.id} className="block text-lg font-semibold text-gray-900">
+                      {question.label}
+                    </label>
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                      Shared
+                    </span>
+                  </div>
+                  {configuredQuestion.helpText && (
+                    <p className="mt-2 text-base text-gray-600">{configuredQuestion.helpText}</p>
+                  )}
+                </div>
+                {showPrices && price > 0 && (
+                  <div className="ml-4 text-right">
+                    <div className="text-lg font-semibold text-gray-900">£{formatPrice(price)}</div>
+                  </div>
+                )}
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="flex-1 px-4 py-3 text-base border-2 border-gray-300 rounded-lg bg-gray-50">
+                  <span className="text-gray-900 font-medium">{currentValue}</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleEditSharedVariable}
+                  className="px-4 py-2 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-300 rounded-lg hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  Edit
+                </button>
+              </div>
+            </div>
+            <SharedVariableEditor
+              isOpen={isEditorOpen}
+              onClose={() => setIsEditorOpen(false)}
+              question={configuredQuestion}
+              currentValue={sharedVarValue}
+              onSave={handleSaveSharedVariable}
+            />
+          </>
+        );
+      }
+      
       return (
         <div className="py-3">
           <div className="flex items-start justify-between mb-2">
@@ -332,7 +422,59 @@ export function QuestionRenderer({ question, answer, onChange, phaseName, showPr
         }
       };
 
-      const price = showPrices ? calculateQuestionPrice(configuredQuestion, answer, phaseName) : 0;
+      // Create a temporary answer for price calculation
+      const tempAnswer: Answer = { questionId: question.id, value: value };
+      const price = showPrices ? calculateQuestionPrice(configuredQuestion, tempAnswer, phaseName) : 0;
+      
+      // If this is a shared variable reference, show read-only display with edit button
+      if (isSharedVarReference && hasSharedVarValue) {
+        return (
+          <>
+            <div className="py-3">
+              <div className="flex items-start justify-between mb-2">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <label htmlFor={question.id} className="block text-lg font-semibold text-gray-900">
+                      {question.label}
+                    </label>
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                      Shared
+                    </span>
+                  </div>
+                  {configuredQuestion.helpText && (
+                    <p className="mt-2 text-base text-gray-600">{configuredQuestion.helpText}</p>
+                  )}
+                </div>
+                {showPrices && price > 0 && (
+                  <div className="ml-4 text-right">
+                    <div className="text-lg font-semibold text-gray-900">£{formatPrice(price)}</div>
+                  </div>
+                )}
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="flex-1 px-4 py-3 text-base border-2 border-gray-300 rounded-lg bg-gray-50">
+                  <span className="text-gray-900 font-medium">{currentValue}</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleEditSharedVariable}
+                  className="px-4 py-2 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-300 rounded-lg hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  Edit
+                </button>
+              </div>
+            </div>
+            <SharedVariableEditor
+              isOpen={isEditorOpen}
+              onClose={() => setIsEditorOpen(false)}
+              question={configuredQuestion}
+              currentValue={sharedVarValue}
+              onSave={handleSaveSharedVariable}
+            />
+          </>
+        );
+      }
+      
       return (
         <div className="py-3">
           <div className="flex items-start justify-between mb-2">

@@ -5,16 +5,21 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:vercel": "vercel dev --listen 5174",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "get-xero-tenant": "node scripts/get-xero-tenant-id.mjs"
   },
   "dependencies": {
     "@react-oauth/google": "^0.12.2",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/react-syntax-highlighter": "^15.5.13",
+    "@vercel/node": "^5.5.13",
     "@vercel/postgres": "^0.10.0",
+    "cookie": "^1.1.1",
     "date-fns": "^4.1.0",
+    "googleapis": "^166.0.0",
     "jsonwebtoken": "^9.0.2",
     "jspdf": "^2.5.1",
     "papaparse": "^5.4.1",
