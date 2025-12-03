@@ -36,3 +36,4 @@ echo "   - Try clearing browser cache"
 echo "   - Try incognito/private window"
 echo "   - Check browser console for exact error"
 
+

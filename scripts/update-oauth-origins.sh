@@ -61,3 +61,4 @@ echo ""
 echo "📝 For now, the easiest way is via the Console UI:"
 echo "   https://console.cloud.google.com/apis/credentials?project=$PROJECT_ID"
 
+

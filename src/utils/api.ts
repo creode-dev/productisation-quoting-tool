@@ -43,7 +43,7 @@ export const quotesAPI = {
   },
 
   getById: async (id: string) => {
-    return fetchAPI(`/quotes/${id}`);
+    return fetchAPI(`/quotes?id=${id}`);
   },
 
   create: async (quote: {
@@ -61,21 +61,22 @@ export const quotesAPI = {
   },
 
   update: async (id: string, updates: any) => {
-    return fetchAPI(`/quotes/${id}`, {
+    return fetchAPI(`/quotes?id=${id}`, {
       method: 'PATCH',
       body: JSON.stringify(updates),
     });
   },
 
   delete: async (id: string) => {
-    return fetchAPI(`/quotes/${id}`, {
+    return fetchAPI(`/quotes?id=${id}`, {
       method: 'DELETE',
     });
   },
 
   accept: async (id: string) => {
-    return fetchAPI(`/quotes/${id}/accept`, {
-      method: 'POST',
+    return fetchAPI(`/quotes?id=${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ action: 'accept' }),
     });
   },
 };
@@ -88,7 +89,7 @@ export const xeroAPI = {
 
 export const employeesAPI = {
   getMe: async () => {
-    return fetchAPI('/employees/me');
+    return fetchAPI('/employees?me=true');
   },
 
   updateMe: async (data: {
@@ -99,7 +100,7 @@ export const employeesAPI = {
     nextOfKinRelationship?: string;
     nextOfKinPhone?: string;
   }) => {
-    return fetchAPI('/employees/me', {
+    return fetchAPI('/employees', {
       method: 'PUT',
       body: JSON.stringify(data),
     });
@@ -110,11 +111,11 @@ export const employeesAPI = {
   },
 
   getById: async (id: string) => {
-    return fetchAPI(`/employees/${id}`);
+    return fetchAPI(`/employees?id=${id}`);
   },
 
   update: async (id: string, data: any) => {
-    return fetchAPI(`/employees/${id}`, {
+    return fetchAPI(`/employees?id=${id}`, {
       method: 'PUT',
       body: JSON.stringify(data),
     });
@@ -134,14 +135,14 @@ export const teamsAPI = {
   },
 
   update: async (id: string, data: { name: string; description?: string }) => {
-    return fetchAPI(`/teams/${id}`, {
+    return fetchAPI(`/teams?id=${id}`, {
       method: 'PUT',
       body: JSON.stringify(data),
     });
   },
 
   delete: async (id: string) => {
-    return fetchAPI(`/teams/${id}`, {
+    return fetchAPI(`/teams?id=${id}`, {
       method: 'DELETE',
     });
   },
@@ -149,7 +150,7 @@ export const teamsAPI = {
 
 export const holidaysAPI = {
   getMe: async () => {
-    return fetchAPI('/holidays/me');
+    return fetchAPI('/holidays?me=true');
   },
 
   getAll: async (filters?: { teamId?: string; status?: string; employeeId?: string }) => {
@@ -162,7 +163,7 @@ export const holidaysAPI = {
   },
 
   getById: async (id: string) => {
-    return fetchAPI(`/holidays/${id}`);
+    return fetchAPI(`/holidays?id=${id}`);
   },
 
   create: async (data: {
@@ -181,49 +182,51 @@ export const holidaysAPI = {
     endDate?: string;
     daysRequested?: number;
   }) => {
-    return fetchAPI(`/holidays/${id}`, {
+    return fetchAPI(`/holidays?id=${id}`, {
       method: 'PUT',
       body: JSON.stringify(data),
     });
   },
 
   cancel: async (id: string) => {
-    return fetchAPI(`/holidays/${id}`, {
+    return fetchAPI(`/holidays?id=${id}`, {
       method: 'DELETE',
     });
   },
 
   approve: async (id: string) => {
-    return fetchAPI(`/holidays/${id}/approve`, {
+    return fetchAPI(`/holidays?id=${id}`, {
       method: 'POST',
+      body: JSON.stringify({ action: 'approve' }),
     });
   },
 
   reject: async (id: string, rejectionReason?: string) => {
-    return fetchAPI(`/holidays/${id}/reject`, {
+    return fetchAPI(`/holidays?id=${id}`, {
       method: 'POST',
-      body: JSON.stringify({ rejectionReason }),
+      body: JSON.stringify({ action: 'reject', rejectionReason }),
     });
   },
 
   getRemaining: async () => {
-    return fetchAPI('/holidays/remaining');
+    return fetchAPI('/holidays?remaining=true');
   },
 
   checkOverlaps: async (teamId: string, startDate: string, endDate: string, excludeRequestId?: string) => {
     const params = new URLSearchParams({
+      overlaps: 'true',
       team_id: teamId,
       start_date: startDate,
       end_date: endDate,
     });
     if (excludeRequestId) params.append('exclude_request_id', excludeRequestId);
-    return fetchAPI(`/holidays/overlaps?${params.toString()}`);
+    return fetchAPI(`/holidays?${params.toString()}`);
   },
 };
 
 export const documentsAPI = {
   getMe: async () => {
-    return fetchAPI('/documents/me');
+    return fetchAPI('/documents?me=true');
   },
 
   upload: async (file: File, documentType: 'passport' | 'visa' | 'other') => {
@@ -240,10 +243,10 @@ export const documentsAPI = {
       reader.readAsDataURL(file);
     });
 
-    return fetchAPI('/documents/upload', {
+    return fetchAPI('/documents', {
       method: 'POST',
       body: JSON.stringify({
-        file: base64,
+        fileContent: base64,
         fileName: file.name,
         mimeType: file.type,
         documentType,
@@ -252,13 +255,13 @@ export const documentsAPI = {
   },
 
   delete: async (id: string) => {
-    return fetchAPI(`/documents/${id}`, {
+    return fetchAPI(`/documents?id=${id}`, {
       method: 'DELETE',
     });
   },
 
   getDownloadLink: async (id: string) => {
-    return fetchAPI(`/documents/${id}/download`);
+    return fetchAPI(`/documents?id=${id}`);
   },
 };
 

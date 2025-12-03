@@ -24,9 +24,9 @@ This guide explains how to configure Google OAuth authentication for the applica
    - Name: Your app name
    - Authorized JavaScript origins: 
      - `http://localhost:5174` (for local development)
-     - `https://your-domain.vercel.app` (for production)
+     - `https://productisation.vercel.app` (for production)
    - Authorized redirect URIs: 
-     - `https://your-domain.vercel.app/api/auth/google` (for production)
+     - `https://productisation.vercel.app/api/auth/google` (for production)
    - Copy the Client ID (you'll need this for `VITE_GOOGLE_CLIENT_ID`)
    - Copy the Client Secret (you'll need this for `GOOGLE_CLIENT_SECRET`)
 
@@ -56,4 +56,5 @@ Add the following environment variables:
 - Check that the redirect URI matches your domain
 - Ensure the email domain restriction is working (only `@creode.co.uk` emails)
 - Verify authorized JavaScript origins include your domain
+
 

@@ -72,3 +72,4 @@ echo "   1. Open: https://console.cloud.google.com/apis/credentials?project=$PRO
 echo "   2. Find client: $CLIENT_ID"
 echo "   3. Verify 'Authorized JavaScript origins' includes: http://localhost:5174"
 
+

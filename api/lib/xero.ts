@@ -12,9 +12,9 @@ function getTenantIds(): string[] {
 
 // interface XeroTokenResponse {
 //   access_token: string;
-  token_type: string;
-  expires_in: number;
-}
+//   token_type: string;
+//   expires_in: number;
+// }
 
 let cachedToken: { token: string; expiresAt: number } | null = null;
 

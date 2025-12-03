@@ -44,8 +44,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.setHeader('Set-Cookie', getAuthCookie(token));
 
     return res.status(200).json({ user, success: true });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Google auth error:', error);
-    return res.status(500).json({ error: 'Authentication failed' });
+    console.error('Error details:', {
+      message: error?.message,
+      stack: error?.stack,
+      name: error?.name
+    });
+    return res.status(500).json({ 
+      error: 'Authentication failed',
+      details: process.env.NODE_ENV === 'development' ? error?.message : undefined
+    });
   }
 }

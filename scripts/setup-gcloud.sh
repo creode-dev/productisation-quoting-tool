@@ -63,3 +63,4 @@ echo ""
 echo "   Or use the update script:"
 echo "      ./scripts/update-oauth-origins.sh"
 
+

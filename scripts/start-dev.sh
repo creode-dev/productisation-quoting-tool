@@ -51,3 +51,4 @@ echo "   Frontend: tail -f /tmp/vite-dev.log"
 echo ""
 echo "🛑 To stop: pkill -f 'vercel dev'; pkill -f vite"
 
+

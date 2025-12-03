@@ -76,3 +76,4 @@ The initialization creates the following tables:
 - Check that the database is not paused or deleted
 - Review Vercel Postgres connection logs in the dashboard
 
+

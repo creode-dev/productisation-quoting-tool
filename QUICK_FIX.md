@@ -91,3 +91,4 @@ Then open: http://localhost:5174
 4. Clear browser cache and try again
 5. Check browser console for exact error message
 
+

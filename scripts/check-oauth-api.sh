@@ -30,3 +30,4 @@ echo ""
 echo "🔧 Let's focus on fixing the API route issue first,"
 echo "   then verify OAuth once API is working."
 
+
