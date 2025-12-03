@@ -24,11 +24,26 @@ export interface User {
 }
 
 export function generateToken(user: User): string {
-  return jwt.sign(
-    { email: user.email, name: user.name, picture: user.picture },
-    JWT_SECRET,
-    { expiresIn: '7d' }
-  );
+  try {
+    if (!JWT_SECRET || JWT_SECRET === 'your-secret-key-change-in-production') {
+      console.error('JWT_SECRET is not set or using default value');
+      throw new Error('JWT_SECRET is not configured');
+    }
+    
+    if (!jwt || typeof jwt.sign !== 'function') {
+      console.error('jsonwebtoken module not loaded correctly');
+      throw new Error('JWT library not available');
+    }
+    
+    return jwt.sign(
+      { email: user.email, name: user.name, picture: user.picture },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+  } catch (error: any) {
+    console.error('Error generating token:', error);
+    throw error;
+  }
 }
 
 export function verifyToken(token: string): User | null {
