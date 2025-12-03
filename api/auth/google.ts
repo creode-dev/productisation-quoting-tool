@@ -7,7 +7,24 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const { credential } = req.body;
+    // Log request details for debugging
+    console.log('Request method:', req.method);
+    console.log('Request body type:', typeof req.body);
+    console.log('Request body:', req.body ? JSON.stringify(req.body).substring(0, 200) : 'null');
+    console.log('Request headers:', JSON.stringify(req.headers).substring(0, 200));
+    
+    // Handle body parsing - Vercel should auto-parse JSON, but let's be explicit
+    let body = req.body;
+    if (typeof body === 'string') {
+      try {
+        body = JSON.parse(body);
+      } catch (e) {
+        console.error('Failed to parse body as JSON:', e);
+        return res.status(400).json({ error: 'Invalid JSON in request body' });
+      }
+    }
+    
+    const { credential } = body || {};
 
     if (!credential) {
       return res.status(400).json({ error: 'No credential provided' });
@@ -49,11 +66,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     console.error('Error details:', {
       message: error?.message,
       stack: error?.stack,
-      name: error?.name
+      name: error?.name,
+      code: error?.code,
+      cause: error?.cause
     });
+    
+    // Return more detailed error in production for debugging
     return res.status(500).json({ 
       error: 'Authentication failed',
-      details: process.env.NODE_ENV === 'development' ? error?.message : undefined
+      message: error?.message || 'Unknown error',
+      type: error?.name || 'Error',
+      // Include stack in production temporarily for debugging
+      stack: error?.stack ? error.stack.split('\n').slice(0, 5).join('\n') : undefined
     });
   }
 }
