@@ -3,9 +3,9 @@ import { generateToken, getAuthCookie } from '../../lib/auth';
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
-const BASE_URL = process.env.VERCEL_URL 
-  ? `https://${process.env.VERCEL_URL}` 
-  : 'https://productisation.vercel.app';
+// Always use production URL for OAuth redirects to avoid staging/preview URL issues
+// This ensures the redirect URI matches what's configured in Google Cloud Console
+const BASE_URL = 'https://productisation.vercel.app';
 const REDIRECT_URI = `${BASE_URL}/api/auth/google/callback`;
 
 // Manual cookie parser
