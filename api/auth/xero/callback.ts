@@ -53,7 +53,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       body: new URLSearchParams({
         grant_type: 'authorization_code',
         code: code as string,
-        redirect_uri: `${req.headers['x-forwarded-proto'] || 'https'}://${req.headers.host}/api/auth/xero/callback`,
+        redirect_uri: 'https://agency.creode.dev/api/auth/xero/callback',
         client_id: XERO_CLIENT_ID,
         client_secret: XERO_CLIENT_SECRET,
       }),
