@@ -19,12 +19,8 @@ async function fetchAPI(endpoint: string, options: RequestInit = {}) {
 }
 
 export const authAPI = {
-  login: async (credential: string) => {
-    return fetchAPI('/auth/google', {
-      method: 'POST',
-      body: JSON.stringify({ credential }),
-    });
-  },
+  // Login now happens via redirect to /api/auth/google/redirect
+  // No API call needed - user is redirected to server-side OAuth flow
 
   getCurrentUser: async () => {
     return fetchAPI('/auth/me');

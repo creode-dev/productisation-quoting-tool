@@ -6,7 +6,6 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   isAuthenticated: boolean;
-  login: (credential: string) => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
 }
@@ -32,16 +31,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     refreshUser();
   }, []);
 
-  const login = async (credential: string) => {
-    try {
-      const { user: loggedInUser } = await authAPI.login(credential);
-      setUser(loggedInUser);
-    } catch (error) {
-      console.error('Login error:', error);
-      throw error;
-    }
-  };
-
   const logout = async () => {
     try {
       await authAPI.logout();
@@ -57,7 +46,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         loading,
         isAuthenticated: !!user,
-        login,
         logout,
         refreshUser,
       }}
