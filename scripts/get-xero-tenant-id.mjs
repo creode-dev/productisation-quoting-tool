@@ -47,7 +47,9 @@ function loadEnv() {
 const env = loadEnv();
 const XERO_CLIENT_ID = env.XERO_CLIENT_ID || '58143CBE02F74BFBB286C6679871FA1C';
 const XERO_CLIENT_SECRET = env.XERO_CLIENT_SECRET || 'tfmVdS82RLEM_9ueiyP3wa9mpISRB3Okkp8VBoGELGqFGkDE';
-const REDIRECT_URI = 'http://localhost:3000/callback';
+// Use production URL for OAuth redirect
+const PRODUCTION_URL = 'https://agency.creode.dev';
+const REDIRECT_URI = `${PRODUCTION_URL}/api/auth/xero/callback`;
 
 async function getTenantIdFromToken(accessToken) {
   try {
