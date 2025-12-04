@@ -32,18 +32,31 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   if (!XERO_CLIENT_ID || !XERO_CLIENT_SECRET) {
+    console.error('Xero credentials missing:', {
+      hasClientId: !!XERO_CLIENT_ID,
+      hasClientSecret: !!XERO_CLIENT_SECRET,
+    });
     return res.status(500).send(`
       <html>
         <head><title>Xero OAuth Error</title></head>
         <body>
           <h1>Configuration Error</h1>
           <p>Xero credentials not configured</p>
+          <p>Client ID: ${XERO_CLIENT_ID ? 'Set' : 'Missing'}</p>
+          <p>Client Secret: ${XERO_CLIENT_SECRET ? 'Set' : 'Missing'}</p>
         </body>
       </html>
     `);
   }
 
   try {
+    const redirectUri = 'https://agency.creode.dev/api/auth/xero/callback';
+    console.log('Exchanging token with:', {
+      clientId: XERO_CLIENT_ID.substring(0, 10) + '...',
+      redirectUri,
+      codeLength: (code as string).length,
+    });
+
     // Exchange code for token
     const tokenResponse = await fetch('https://identity.xero.com/connect/token', {
       method: 'POST',
@@ -53,7 +66,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       body: new URLSearchParams({
         grant_type: 'authorization_code',
         code: code as string,
-        redirect_uri: 'https://agency.creode.dev/api/auth/xero/callback',
+        redirect_uri: redirectUri,
         client_id: XERO_CLIENT_ID,
         client_secret: XERO_CLIENT_SECRET,
       }),
@@ -61,12 +74,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (!tokenResponse.ok) {
       const errorText = await tokenResponse.text();
+      console.error('Token exchange failed:', {
+        status: tokenResponse.status,
+        statusText: tokenResponse.statusText,
+        error: errorText,
+      });
       return res.status(400).send(`
         <html>
           <head><title>Xero OAuth Error</title></head>
           <body>
             <h1>Token Exchange Failed</h1>
+            <p><strong>Status:</strong> ${tokenResponse.status} ${tokenResponse.statusText}</p>
             <pre>${errorText}</pre>
+            <h2>Debugging Info:</h2>
+            <ul>
+              <li>Redirect URI used: ${redirectUri}</li>
+              <li>Client ID: ${XERO_CLIENT_ID.substring(0, 10)}...</li>
+              <li>Make sure the redirect URI in Xero matches exactly: ${redirectUri}</li>
+              <li>Make sure the Client Secret in Vercel matches the one in Xero Developer Portal</li>
+            </ul>
             <p><a href="/">Return to app</a></p>
           </body>
         </html>
