@@ -9,7 +9,7 @@ interface DocumentationViewerProps {
 
 export function DocumentationViewer({ content }: DocumentationViewerProps) {
   return (
-    <div className="prose prose-lg max-w-none px-8 py-6">
+    <div className="prose prose-lg max-w-4xl mx-auto px-8 py-6 break-words">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
@@ -17,15 +17,21 @@ export function DocumentationViewer({ content }: DocumentationViewerProps) {
             const match = /language-(\w+)/.exec(className || '');
             const isInline = !match;
             return !isInline && match ? (
-              <SyntaxHighlighter
-                style={vscDarkPlus as { [key: string]: React.CSSProperties }}
-                language={match[1]}
-                PreTag="div"
-              >
-                {String(children).replace(/\n$/, '')}
-              </SyntaxHighlighter>
+              <div className="overflow-x-auto my-4">
+                <SyntaxHighlighter
+                  style={vscDarkPlus as { [key: string]: React.CSSProperties }}
+                  language={match[1]}
+                  PreTag="div"
+                  customStyle={{
+                    borderRadius: '0.375rem',
+                    padding: '1rem',
+                  }}
+                >
+                  {String(children).replace(/\n$/, '')}
+                </SyntaxHighlighter>
+              </div>
             ) : (
-              <code className={className} {...props}>
+              <code className={`${className} break-words`} {...props}>
                 {children}
               </code>
             );
@@ -40,7 +46,7 @@ export function DocumentationViewer({ content }: DocumentationViewerProps) {
             <h3 className="text-2xl font-semibold text-gray-900 mb-2 mt-4" {...props} />
           ),
           p: ({ node, ...props }) => (
-            <p className="text-gray-700 mb-4 leading-relaxed" {...props} />
+            <p className="text-gray-700 mb-4 leading-relaxed break-words" {...props} />
           ),
           ul: ({ node, ...props }) => (
             <ul className="list-disc list-inside mb-4 space-y-2 text-gray-700" {...props} />
@@ -58,7 +64,7 @@ export function DocumentationViewer({ content }: DocumentationViewerProps) {
             />
           ),
           a: ({ node, ...props }) => (
-            <a className="text-blue-600 hover:text-blue-800 underline" {...props} />
+            <a className="text-blue-600 hover:text-blue-800 underline break-all" {...props} />
           ),
           strong: ({ node, ...props }) => (
             <strong className="font-semibold text-gray-900" {...props} />

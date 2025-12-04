@@ -34,7 +34,13 @@ async function getXeroAccessToken(): Promise<string> {
     return storedToken;
   }
 
+  // Log what's missing for debugging
   if (!XERO_CLIENT_ID || !XERO_CLIENT_SECRET) {
+    console.error('Xero credentials missing:', {
+      hasClientId: !!XERO_CLIENT_ID,
+      hasClientSecret: !!XERO_CLIENT_SECRET,
+      hasAccessToken: !!storedToken,
+    });
     throw new Error('Xero credentials not configured. Please set XERO_ACCESS_TOKEN or XERO_CLIENT_ID and XERO_CLIENT_SECRET');
   }
 
@@ -42,6 +48,7 @@ async function getXeroAccessToken(): Promise<string> {
   // This is a placeholder - you'll need to implement the actual OAuth flow
   // or use a stored access token from environment variables
   
+  console.error('Xero access token not available. XERO_ACCESS_TOKEN not set and OAuth flow not implemented.');
   throw new Error('Xero access token not available. Please set XERO_ACCESS_TOKEN environment variable or implement OAuth flow.');
 }
 
@@ -70,7 +77,12 @@ async function searchXeroCompaniesForTenant(
     );
 
     if (!response.ok) {
-      console.error(`Xero API request failed for tenant ${tenantId}: ${response.statusText}`);
+      const errorText = await response.text().catch(() => 'Unable to read error response');
+      console.error(`Xero API request failed for tenant ${tenantId}:`, {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorText,
+      });
       return [];
     }
 
@@ -94,17 +106,18 @@ async function searchXeroCompaniesForTenant(
 }
 
 export async function searchXeroCompanies(query: string): Promise<XeroCompany[]> {
-  const tenantIds = getTenantIds();
-  
-  if (tenantIds.length === 0) {
-    throw new Error('Xero tenant ID not configured');
-  }
-
   if (!query || query.trim().length < 2) {
     return [];
   }
 
   try {
+    const tenantIds = getTenantIds();
+    
+    if (tenantIds.length === 0) {
+      console.error('Xero tenant ID not configured');
+      return [];
+    }
+
     const token = await getXeroAccessToken();
     
     // Search across all tenants in parallel
@@ -131,6 +144,11 @@ export async function searchXeroCompanies(query: string): Promise<XeroCompany[]>
     );
   } catch (error) {
     console.error('Error searching Xero companies:', error);
+    // Log the full error details for debugging
+    if (error instanceof Error) {
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+    }
     return [];
   }
 }
