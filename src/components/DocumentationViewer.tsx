@@ -9,7 +9,7 @@ interface DocumentationViewerProps {
 
 export function DocumentationViewer({ content }: DocumentationViewerProps) {
   return (
-    <div className="prose prose-lg max-w-4xl mx-auto px-8 py-6 break-words">
+    <div className="prose prose-lg w-4/5 mx-auto px-8 py-6 break-words">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
