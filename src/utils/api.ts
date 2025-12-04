@@ -19,17 +19,23 @@ async function fetchAPI(endpoint: string, options: RequestInit = {}) {
 }
 
 export const authAPI = {
-  // Login now happens via redirect to /api/auth/google/redirect
-  // No API call needed - user is redirected to server-side OAuth flow
-
+  // Authentication is temporarily disabled
+  // TODO: Re-enable when Google OAuth is implemented
+  
   getCurrentUser: async () => {
-    return fetchAPI('/auth/me');
+    // Return mock user for now
+    return {
+      user: {
+        email: 'user@creode.co.uk',
+        name: 'Demo User',
+        picture: undefined,
+      },
+    };
   },
 
   logout: async () => {
-    return fetchAPI('/auth/logout', {
-      method: 'POST',
-    });
+    // No-op for now
+    return { success: true };
   },
 };
 

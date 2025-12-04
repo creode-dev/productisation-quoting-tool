@@ -1,6 +1,5 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, ReactNode } from 'react';
 import { User } from '../types/auth';
-import { authAPI } from '../utils/api';
 
 interface AuthContextType {
   user: User | null;
@@ -12,32 +11,28 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Mock user for now - authentication is temporarily disabled
+const MOCK_USER: User = {
+  email: 'user@creode.co.uk',
+  name: 'Demo User',
+  picture: undefined,
+};
+
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
+  // Authentication is temporarily disabled
+  // TODO: Re-enable authentication when Google OAuth is implemented
+  // For now, return a mock authenticated user
+  const user = MOCK_USER;
+  const loading = false;
+  const isAuthenticated = true;
 
   const refreshUser = async () => {
-    try {
-      const { user: currentUser } = await authAPI.getCurrentUser();
-      setUser(currentUser);
-    } catch (error) {
-      setUser(null);
-    } finally {
-      setLoading(false);
-    }
+    // No-op for now
   };
 
-  useEffect(() => {
-    refreshUser();
-  }, []);
-
   const logout = async () => {
-    try {
-      await authAPI.logout();
-      setUser(null);
-    } catch (error) {
-      console.error('Logout error:', error);
-    }
+    // No-op for now - could navigate to login page if needed
+    console.log('Logout called (authentication disabled)');
   };
 
   return (
@@ -45,7 +40,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       value={{
         user,
         loading,
-        isAuthenticated: !!user,
+        isAuthenticated,
         logout,
         refreshUser,
       }}

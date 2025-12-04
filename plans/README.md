@@ -29,12 +29,16 @@ This directory contains separate plan documents for each development phase. Each
 
 ## Plan Files
 
+### Phased Development Plans
 - [Phase-1-Foundation-Audit-Trails.md](./Phase-1-Foundation-Audit-Trails.md)
 - [Phase-2-Quote-Approval-System.md](./Phase-2-Quote-Approval-System.md)
 - [Phase-3-Ticketing-System.md](./Phase-3-Ticketing-System.md)
 - [Phase-4-Invoice-Generation.md](./Phase-4-Invoice-Generation.md)
 - [Phase-5-Phase-Sign-Off-System.md](./Phase-5-Phase-Sign-Off-System.md)
 - [Phase-6-Documentation-Management.md](./Phase-6-Documentation-Management.md)
+
+### Long-Term Plans
+- [Long-Term-Google-Login.md](./Long-Term-Google-Login.md) - Google OAuth 2.0 authentication implementation
 
 ## Integration Points
 
