@@ -83,7 +83,16 @@ async function searchXeroCompaniesForTenant(
         status: response.status,
         statusText: response.statusText,
         error: errorText,
+        tokenLength: token.length,
+        tokenStart: token.substring(0, 10),
       });
+      
+      // If token is invalid/expired, clear cache
+      if (response.status === 401) {
+        console.error('Xero token appears to be expired or invalid');
+        cachedToken = null;
+      }
+      
       return [];
     }
 
