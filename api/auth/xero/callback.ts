@@ -51,10 +51,31 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   try {
     const redirectUri = 'https://agency.creode.dev/api/auth/xero/callback';
+    
+    // Log what we're sending (without exposing the full secret)
     console.log('Exchanging token with:', {
-      clientId: XERO_CLIENT_ID.substring(0, 10) + '...',
+      clientId: XERO_CLIENT_ID,
+      clientSecretLength: XERO_CLIENT_SECRET?.length || 0,
+      clientSecretStart: XERO_CLIENT_SECRET?.substring(0, 5) || 'missing',
       redirectUri,
       codeLength: (code as string).length,
+    });
+
+    // Build the request body
+    const params = new URLSearchParams({
+      grant_type: 'authorization_code',
+      code: code as string,
+      redirect_uri: redirectUri,
+      client_id: XERO_CLIENT_ID,
+      client_secret: XERO_CLIENT_SECRET,
+    });
+
+    console.log('Request params (without secret):', {
+      grant_type: 'authorization_code',
+      code: (code as string).substring(0, 10) + '...',
+      redirect_uri: redirectUri,
+      client_id: XERO_CLIENT_ID,
+      client_secret_length: XERO_CLIENT_SECRET?.length || 0,
     });
 
     // Exchange code for token
@@ -63,35 +84,48 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: new URLSearchParams({
-        grant_type: 'authorization_code',
-        code: code as string,
-        redirect_uri: redirectUri,
-        client_id: XERO_CLIENT_ID,
-        client_secret: XERO_CLIENT_SECRET,
-      }),
+      body: params,
     });
 
     if (!tokenResponse.ok) {
       const errorText = await tokenResponse.text();
+      let errorDetails;
+      try {
+        errorDetails = JSON.parse(errorText);
+      } catch {
+        errorDetails = errorText;
+      }
+      
       console.error('Token exchange failed:', {
         status: tokenResponse.status,
         statusText: tokenResponse.statusText,
-        error: errorText,
+        error: errorDetails,
+        clientId: XERO_CLIENT_ID,
+        clientSecretLength: XERO_CLIENT_SECRET?.length || 0,
+        redirectUri,
       });
+      
       return res.status(400).send(`
         <html>
           <head><title>Xero OAuth Error</title></head>
           <body>
             <h1>Token Exchange Failed</h1>
             <p><strong>Status:</strong> ${tokenResponse.status} ${tokenResponse.statusText}</p>
-            <pre>${errorText}</pre>
+            <pre>${JSON.stringify(errorDetails, null, 2)}</pre>
             <h2>Debugging Info:</h2>
             <ul>
               <li>Redirect URI used: ${redirectUri}</li>
-              <li>Client ID: ${XERO_CLIENT_ID.substring(0, 10)}...</li>
-              <li>Make sure the redirect URI in Xero matches exactly: ${redirectUri}</li>
-              <li>Make sure the Client Secret in Vercel matches the one in Xero Developer Portal</li>
+              <li>Client ID: ${XERO_CLIENT_ID}</li>
+              <li>Client Secret length: ${XERO_CLIENT_SECRET?.length || 0} characters</li>
+              <li>Client Secret starts with: ${XERO_CLIENT_SECRET?.substring(0, 5) || 'MISSING'}...</li>
+            </ul>
+            <h2>Checklist:</h2>
+            <ul>
+              <li>✓ Redirect URI in Xero must match exactly: ${redirectUri}</li>
+              <li>✓ Client ID in Vercel must match: ${XERO_CLIENT_ID}</li>
+              <li>✓ Client Secret in Vercel must match the ACTIVE secret in Xero</li>
+              <li>⚠️ If you have multiple Client Secrets in Xero, make sure you're using the most recent one</li>
+              <li>⚠️ Client Secrets are case-sensitive and must match exactly</li>
             </ul>
             <p><a href="/">Return to app</a></p>
           </body>
