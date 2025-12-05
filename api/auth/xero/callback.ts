@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
-const XERO_CLIENT_ID = process.env.XERO_CLIENT_ID;
-const XERO_CLIENT_SECRET = process.env.XERO_CLIENT_SECRET;
+const XERO_CLIENT_ID = process.env.XERO_CLIENT_ID?.trim();
+const XERO_CLIENT_SECRET = process.env.XERO_CLIENT_SECRET?.trim();
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { code, error } = req.query;
