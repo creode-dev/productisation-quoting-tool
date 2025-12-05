@@ -1,6 +1,6 @@
-const XERO_CLIENT_ID = process.env.XERO_CLIENT_ID;
-const XERO_CLIENT_SECRET = process.env.XERO_CLIENT_SECRET;
-const XERO_TENANT_ID = process.env.XERO_TENANT_ID;
+const XERO_CLIENT_ID = process.env.XERO_CLIENT_ID?.trim();
+const XERO_CLIENT_SECRET = process.env.XERO_CLIENT_SECRET?.trim();
+const XERO_TENANT_ID = process.env.XERO_TENANT_ID?.trim();
 
 // Get array of tenant IDs (supports comma-separated list)
 function getTenantIds(): string[] {
@@ -25,12 +25,13 @@ async function getXeroAccessToken(): Promise<string> {
   }
 
   // Check if access token is stored in environment (for server-to-server)
-  const storedToken = process.env.XERO_ACCESS_TOKEN;
+  const storedToken = process.env.XERO_ACCESS_TOKEN?.trim();
   if (storedToken) {
     cachedToken = {
       token: storedToken,
       expiresAt: Date.now() + (3600 * 1000), // Assume 1 hour validity
     };
+    console.log('Using stored Xero access token (length:', storedToken.length, ')');
     return storedToken;
   }
 
