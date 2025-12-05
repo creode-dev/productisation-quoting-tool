@@ -38,8 +38,11 @@ export function CompanyAutocomplete({
     setLoading(true);
     debounceTimer.current = setTimeout(async () => {
       try {
+        console.log('Searching companies for query:', query);
         const response = await xeroAPI.searchCompanies(query);
+        console.log('Xero API response:', response);
         const results = response?.companies || [];
+        console.log('Companies found:', results.length, results);
         setCompanies(results);
         setIsOpen(results.length > 0);
       } catch (error) {
