@@ -3,7 +3,14 @@ import { getCurrentUser } from '../../lib/auth.js';
 import { getXeroTokens } from '../../lib/xeroTokens.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  const user = getCurrentUser(req);
+  let user;
+  try {
+    user = getCurrentUser(req);
+  } catch (error: any) {
+    console.error('Auth error in token-status:', error);
+    return res.status(401).json({ error: 'Not authenticated', details: error.message });
+  }
+  
   if (!user) {
     return res.status(401).json({ error: 'Not authenticated' });
   }

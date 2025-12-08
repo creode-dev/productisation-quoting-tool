@@ -144,8 +144,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(200).json(results);
   } catch (error: any) {
     console.error('Error in Xero setup:', error);
+    console.error('Error stack:', error.stack);
     return res.status(500).json({
       error: error.message || 'Failed to setup Xero',
+      details: String(error),
       timestamp: new Date().toISOString(),
     });
   }
