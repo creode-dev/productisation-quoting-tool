@@ -16,10 +16,49 @@ export function XeroSettings() {
   const [status, setStatus] = useState<XeroStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
+  const [setupInfo, setSetupInfo] = useState<any>(null);
 
   useEffect(() => {
     checkStatus();
+    // Also run setup check
+    checkSetup();
   }, []);
+
+  const checkSetup = async () => {
+    try {
+      const response = await fetch('/api/xero/setup');
+      const data = await response.json();
+      setSetupInfo(data);
+      // Update status if setup provides more info
+      if (data.tokens) {
+        setStatus(prev => ({
+          ...prev,
+          authenticated: data.tokens.exists,
+          tenantIds: data.tokens.tenantIds || prev?.tenantIds,
+        }));
+      }
+    } catch (error) {
+      console.error('Error checking Xero setup:', error);
+    }
+  };
+
+  const runSetup = async () => {
+    try {
+      setSyncing(true);
+      const response = await fetch('/api/xero/setup', { method: 'POST' });
+      const data = await response.json();
+      setSetupInfo(data);
+      if (data.tokens) {
+        await checkStatus();
+      }
+      alert(data.status === 'ready' ? 'Setup complete! Xero is ready to use.' : `Setup: ${data.status}`);
+    } catch (error) {
+      console.error('Error running setup:', error);
+      alert('Error running setup');
+    } finally {
+      setSyncing(false);
+    }
+  };
 
   const checkStatus = async () => {
     try {
@@ -127,13 +166,20 @@ export function XeroSettings() {
               </div>
             )}
 
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
+              <button
+                onClick={runSetup}
+                disabled={syncing}
+                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
+              >
+                {syncing ? 'Running Setup...' : 'Run Setup'}
+              </button>
               <button
                 onClick={handleSyncTenantIds}
                 disabled={syncing}
                 className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 disabled:opacity-50"
               >
-                {syncing ? 'Syncing...' : 'Sync Tenant IDs from Env'}
+                {syncing ? 'Syncing...' : 'Sync Tenant IDs'}
               </button>
               <button
                 onClick={handleConnect}
@@ -145,9 +191,24 @@ export function XeroSettings() {
                 onClick={checkStatus}
                 className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
               >
-                Refresh Status
+                Refresh
               </button>
             </div>
+            
+            {setupInfo && setupInfo.steps && (
+              <div className="mt-4 space-y-2">
+                <p className="text-sm font-semibold">Setup Steps:</p>
+                {setupInfo.steps.map((step: any, idx: number) => (
+                  <div key={idx} className={`text-sm p-2 rounded ${
+                    step.status === 'success' ? 'bg-green-50 text-green-800' :
+                    step.status === 'error' ? 'bg-red-50 text-red-800' :
+                    'bg-yellow-50 text-yellow-800'
+                  }`}>
+                    {step.status === 'success' ? '✓' : step.status === 'error' ? '✗' : '○'} {step.step}: {step.message}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 

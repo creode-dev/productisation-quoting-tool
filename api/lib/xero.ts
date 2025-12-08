@@ -28,12 +28,14 @@ async function getXeroAccessToken(): Promise<string> {
     // Fallback to environment variable if database tokens not available
     const storedToken = process.env.XERO_ACCESS_TOKEN?.trim();
     if (storedToken) {
-      console.warn('Using fallback XERO_ACCESS_TOKEN from environment. Automatic refresh not available.');
+      console.warn('[Xero] Using fallback XERO_ACCESS_TOKEN from environment. Automatic refresh not available.');
+      // Check if token is still valid by making a test call
+      // For now, just return it - the API call will fail if invalid
       return storedToken;
     }
 
-    console.error('Xero access token error:', error);
-    throw new Error(`Xero access token not available: ${error.message}. Please authenticate with Xero at /api/auth/xero/redirect`);
+    console.error('[Xero] Access token error:', error);
+    throw new Error(`Xero access token not available: ${error.message}. Please authenticate with Xero at /api/auth/xero/redirect or visit /settings/xero`);
   }
 }
 
@@ -126,7 +128,31 @@ export async function searchXeroCompanies(query: string): Promise<XeroCompany[]>
     console.log(`[Xero Search] Tenant IDs found:`, tenantIds);
     
     if (tenantIds.length === 0) {
-      console.error('[Xero Search] Xero tenant ID not configured');
+      console.error('[Xero Search] Xero tenant ID not configured. Check XERO_TENANT_ID env var or connect via OAuth.');
+      // Try to get from env as fallback
+      const XERO_TENANT_ID = process.env.XERO_TENANT_ID?.trim();
+      if (XERO_TENANT_ID) {
+        const envTenantIds = XERO_TENANT_ID.split(',').map(id => id.trim()).filter(id => id.length > 0);
+        console.log(`[Xero Search] Using tenant IDs from env var:`, envTenantIds);
+        if (envTenantIds.length > 0) {
+          // Use env tenant IDs for this search
+          const token = await getXeroAccessToken();
+          const searchPromises = envTenantIds.map(tenantId => 
+            searchXeroCompaniesForTenant(query, tenantId, token)
+          );
+          const results = await Promise.all(searchPromises);
+          const allCompanies = results.flat();
+          const uniqueCompanies = new Map<string, XeroCompany>();
+          for (const company of allCompanies) {
+            if (!uniqueCompanies.has(company.ContactID)) {
+              uniqueCompanies.set(company.ContactID, company);
+            }
+          }
+          return Array.from(uniqueCompanies.values()).sort((a, b) => 
+            a.Name.localeCompare(b.Name)
+          );
+        }
+      }
       return [];
     }
 
