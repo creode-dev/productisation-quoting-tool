@@ -43,7 +43,7 @@ export async function storeXeroTokens(tokenData: XeroTokenData): Promise<void> {
         ${tokenData.refresh_token},
         ${tokenData.token_type || 'Bearer'},
         ${tokenData.expires_in},
-        ${expiresAt},
+        ${expiresAt.toISOString()},
         ${tokenData.scope || null},
         ${tokenData.tenant_id || null},
         ${tokenData.tenant_ids || null},

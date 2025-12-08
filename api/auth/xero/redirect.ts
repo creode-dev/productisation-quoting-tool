@@ -3,7 +3,7 @@ import { randomBytes } from 'crypto';
 
 const XERO_CLIENT_ID = process.env.XERO_CLIENT_ID?.trim();
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export default async function handler(_req: VercelRequest, res: VercelResponse) {
   if (!XERO_CLIENT_ID) {
     return res.status(500).send(`
       <html>
