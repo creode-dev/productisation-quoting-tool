@@ -1,56 +1,40 @@
-const XERO_CLIENT_ID = process.env.XERO_CLIENT_ID?.trim();
-const XERO_CLIENT_SECRET = process.env.XERO_CLIENT_SECRET?.trim();
 const XERO_TENANT_ID = process.env.XERO_TENANT_ID?.trim();
+import { getValidXeroAccessToken, getXeroTokens } from './xeroTokens';
 
-// Get array of tenant IDs (supports comma-separated list)
-function getTenantIds(): string[] {
-  if (!XERO_TENANT_ID) {
-    return [];
+// Get array of tenant IDs (supports comma-separated list from env or database)
+async function getTenantIds(): Promise<string[]> {
+  // First try to get from database tokens
+  const tokens = await getXeroTokens();
+  if (tokens?.tenant_ids && tokens.tenant_ids.length > 0) {
+    return tokens.tenant_ids;
   }
-  return XERO_TENANT_ID.split(',').map(id => id.trim()).filter(id => id.length > 0);
+
+  // Fallback to environment variable
+  if (XERO_TENANT_ID) {
+    return XERO_TENANT_ID.split(',').map(id => id.trim()).filter(id => id.length > 0);
+  }
+
+  return [];
 }
 
-// interface XeroTokenResponse {
-//   access_token: string;
-//   token_type: string;
-//   expires_in: number;
-// }
-
-let cachedToken: { token: string; expiresAt: number } | null = null;
-
+/**
+ * Get Xero access token, automatically refreshing if expired
+ */
 async function getXeroAccessToken(): Promise<string> {
-  // If we have a valid cached token, return it
-  if (cachedToken && cachedToken.expiresAt > Date.now() + 60000) {
-    return cachedToken.token;
-  }
+  try {
+    // Use the token service which handles refresh automatically
+    return await getValidXeroAccessToken();
+  } catch (error: any) {
+    // Fallback to environment variable if database tokens not available
+    const storedToken = process.env.XERO_ACCESS_TOKEN?.trim();
+    if (storedToken) {
+      console.warn('Using fallback XERO_ACCESS_TOKEN from environment. Automatic refresh not available.');
+      return storedToken;
+    }
 
-  // Check if access token is stored in environment (for server-to-server)
-  const storedToken = process.env.XERO_ACCESS_TOKEN?.trim();
-  if (storedToken) {
-    cachedToken = {
-      token: storedToken,
-      expiresAt: Date.now() + (3600 * 1000), // Assume 1 hour validity
-    };
-    console.log('Using stored Xero access token (length:', storedToken.length, ')');
-    return storedToken;
+    console.error('Xero access token error:', error);
+    throw new Error(`Xero access token not available: ${error.message}. Please authenticate with Xero at /api/auth/xero/redirect`);
   }
-
-  // Log what's missing for debugging
-  if (!XERO_CLIENT_ID || !XERO_CLIENT_SECRET) {
-    console.error('Xero credentials missing:', {
-      hasClientId: !!XERO_CLIENT_ID,
-      hasClientSecret: !!XERO_CLIENT_SECRET,
-      hasAccessToken: !!storedToken,
-    });
-    throw new Error('Xero credentials not configured. Please set XERO_ACCESS_TOKEN or XERO_CLIENT_ID and XERO_CLIENT_SECRET');
-  }
-
-  // For server-to-server OAuth, you may need to use a refresh token flow
-  // This is a placeholder - you'll need to implement the actual OAuth flow
-  // or use a stored access token from environment variables
-  
-  console.error('Xero access token not available. XERO_ACCESS_TOKEN not set and OAuth flow not implemented.');
-  throw new Error('Xero access token not available. Please set XERO_ACCESS_TOKEN environment variable or implement OAuth flow.');
 }
 
 export interface XeroCompany {
@@ -121,7 +105,7 @@ export async function searchXeroCompanies(query: string): Promise<XeroCompany[]>
   }
 
   try {
-    const tenantIds = getTenantIds();
+    const tenantIds = await getTenantIds();
     
     if (tenantIds.length === 0) {
       console.error('Xero tenant ID not configured');

@@ -1,10 +1,11 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
+import { storeXeroTokens } from '../../lib/xeroTokens';
 
 const XERO_CLIENT_ID = process.env.XERO_CLIENT_ID?.trim();
 const XERO_CLIENT_SECRET = process.env.XERO_CLIENT_SECRET?.trim();
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  const { code, error } = req.query;
+  const { code, error, state } = req.query;
 
   if (error) {
     return res.status(400).send(`
@@ -31,6 +32,27 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     `);
   }
 
+  // Verify CSRF state token
+  const cookies = req.headers.cookie || '';
+  const stateCookie = cookies.split(';').find(c => c.trim().startsWith('xero-oauth-state='));
+  const storedState = stateCookie?.split('=')[1];
+  
+  if (!state || state !== storedState) {
+    return res.status(400).send(`
+      <html>
+        <head><title>Xero OAuth Error</title></head>
+        <body>
+          <h1>Invalid State Token</h1>
+          <p>CSRF verification failed. Please try again.</p>
+          <p><a href="/">Return to app</a></p>
+        </body>
+      </html>
+    `);
+  }
+
+  // Clear state cookie
+  res.setHeader('Set-Cookie', 'xero-oauth-state=; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=0');
+
   if (!XERO_CLIENT_ID || !XERO_CLIENT_SECRET) {
     console.error('Xero credentials missing:', {
       hasClientId: !!XERO_CLIENT_ID,
@@ -50,7 +72,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const redirectUri = 'https://agency.creode.dev/api/auth/xero/callback';
+    // Determine redirect URI based on environment
+    const redirectUri = process.env.VERCEL_ENV === 'production'
+      ? 'https://agency.creode.dev/api/auth/xero/callback'
+      : `http://localhost:${process.env.PORT || 3000}/api/auth/xero/callback`;
     
     // Log what we're sending (without exposing the full secret)
     console.log('Exchanging token with:', {
@@ -144,10 +169,27 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
 
     let tenantInfo = 'Unable to fetch tenant information';
+    let tenantIds: string[] = [];
     if (connectionsResponse.ok) {
       const connections = await connectionsResponse.json();
-      const tenantIds = connections.map((c: any) => c.tenantId).join(',');
-      tenantInfo = `Tenant IDs: ${tenantIds}`;
+      tenantIds = connections.map((c: any) => c.tenantId);
+      tenantInfo = `Tenant IDs: ${tenantIds.join(', ')}`;
+    }
+
+    // Store tokens in database for automatic refresh
+    try {
+      await storeXeroTokens({
+        access_token: tokenData.access_token,
+        refresh_token: tokenData.refresh_token || '',
+        token_type: tokenData.token_type || 'Bearer',
+        expires_in: tokenData.expires_in || 1800, // Default 30 minutes
+        scope: tokenData.scope,
+        tenant_ids: tenantIds,
+      });
+      console.log('Xero tokens stored successfully in database');
+    } catch (storeError) {
+      console.error('Error storing Xero tokens:', storeError);
+      // Continue anyway - tokens are still displayed for manual setup
     }
 
     // Display the tokens
@@ -193,10 +235,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
           <h2>Next Steps:</h2>
           <ol>
-            <li>Copy the Access Token above</li>
-            <li>Set it in Vercel as <code>XERO_ACCESS_TOKEN</code></li>
-            <li>The Tenant IDs are already configured</li>
+            <li><strong>✅ Tokens have been automatically stored in the database</strong></li>
+            <li>The system will now automatically refresh tokens when they expire</li>
+            <li>No manual token updates are required</li>
+            <li>You can close this page and return to the app</li>
           </ol>
+          
+          <div class="warning">
+            <strong>Note:</strong> If token storage failed, you can still manually set 
+            <code>XERO_ACCESS_TOKEN</code> in Vercel, but automatic refresh will not work.
+          </div>
 
           <p><a href="/">Return to app</a></p>
 

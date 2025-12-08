@@ -243,3 +243,5 @@ Update Xero OAuth scopes to include:
 - Users can view created invoices
 - Ready for future enhancements (invoice status sync, etc.)
 
+
+

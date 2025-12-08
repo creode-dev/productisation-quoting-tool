@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { getCurrentUser } from '../lib/auth';
 import { sql } from '../lib/db';
+import { logAction, createChangesObject } from '../lib/audit';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const user = getCurrentUser(req);
@@ -47,6 +48,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (req.method === 'DELETE') {
       try {
+        // Get quote before deletion for audit log
+        const quoteBefore = await sql`
+          SELECT * FROM quotes WHERE id = ${quoteId} LIMIT 1
+        `;
+
         const result = await sql`
           DELETE FROM quotes
           WHERE id = ${quoteId}
@@ -55,6 +61,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
         if (result.rows.length === 0) {
           return res.status(404).json({ error: 'Quote not found' });
+        }
+
+        // Log deletion
+        if (quoteBefore.rows.length > 0) {
+          await logAction(req, {
+            userId: user.email,
+            action: 'quote.deleted',
+            entityType: 'quote',
+            entityId: quoteId,
+            changes: createChangesObject(quoteBefore.rows[0], null),
+          });
         }
 
         return res.status(200).json({ success: true });
@@ -68,6 +85,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       try {
         // Check if this is an accept action
         if (req.body.action === 'accept') {
+          // Get quote before update for audit log
+          const quoteBefore = await sql`
+            SELECT * FROM quotes WHERE id = ${quoteId} LIMIT 1
+          `;
+
           const result = await sql`
             UPDATE quotes
             SET 
@@ -83,10 +105,30 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             return res.status(404).json({ error: 'Quote not found' });
           }
 
+          // Log acceptance
+          if (quoteBefore.rows.length > 0) {
+            await logAction(req, {
+              userId: user.email,
+              action: 'quote.accepted',
+              entityType: 'quote',
+              entityId: quoteId,
+              changes: createChangesObject(quoteBefore.rows[0], result.rows[0]),
+            });
+          }
+
           return res.status(200).json({ 
             quote: result.rows[0],
             message: 'Quote accepted successfully'
           });
+        }
+
+        // Get quote before update for audit log
+        const quoteBefore = await sql`
+          SELECT * FROM quotes WHERE id = ${quoteId} LIMIT 1
+        `;
+
+        if (quoteBefore.rows.length === 0) {
+          return res.status(404).json({ error: 'Quote not found' });
         }
 
         // Regular update
@@ -121,6 +163,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         if (result.rows.length === 0) {
           return res.status(404).json({ error: 'Quote not found' });
         }
+
+        // Log update
+        await logAction(req, {
+          userId: user.email,
+          action: 'quote.updated',
+          entityType: 'quote',
+          entityId: quoteId,
+          changes: createChangesObject(quoteBefore.rows[0], result.rows[0]),
+        });
 
         return res.status(200).json({ quote: result.rows[0] });
       } catch (error) {
@@ -198,9 +249,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         RETURNING id, created_at
       `;
 
+      const quoteId = result.rows[0].id;
+
+      // Log creation
+      await logAction(req, {
+        userId: user.email,
+        action: 'quote.created',
+        entityType: 'quote',
+        entityId: quoteId,
+        changes: createChangesObject(null, {
+          id: quoteId,
+          companyName,
+          projectName,
+          status: 'draft',
+        }),
+      });
+
       return res.status(200).json({
         quote: {
-          id: result.rows[0].id,
+          id: quoteId,
           ...req.body,
           status: 'draft',
           createdAt: result.rows[0].created_at,

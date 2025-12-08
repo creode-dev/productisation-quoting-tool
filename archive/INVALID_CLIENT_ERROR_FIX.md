@@ -103,3 +103,5 @@ Or wait for Vercel to auto-deploy (environment variable changes don't always tri
 3. Click "Sign in with Google"
 4. Should redirect to Google OAuth (not show invalid_client error)
 
+
+

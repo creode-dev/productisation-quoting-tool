@@ -28,7 +28,7 @@ npx vercel env add VITE_GOOGLE_SHEET_ID production
 
 # Google OAuth Client ID (for authentication)
 npx vercel env add VITE_GOOGLE_CLIENT_ID production
-# Enter: Your Google OAuth Client ID (see SETUP.md for instructions)
+# Enter: Your Google OAuth Client ID (see [Setup Guide](./SETUP.md) for instructions)
 ```
 
 #### Preview/Staging Environment
@@ -78,7 +78,7 @@ npx vercel
      - **Value**: `1jIGuVrI6cPtY-zDLHwV3muej2zi4jjRAnNu8aODr27k`
      - Add to: Production, Preview, and Development
    - **Name**: `VITE_GOOGLE_CLIENT_ID`
-     - **Value**: Your Google OAuth Client ID (see SETUP.md for instructions)
+     - **Value**: Your Google OAuth Client ID (see [Setup Guide](./SETUP.md) for instructions)
      - Add to: Production, Preview, and Development
 6. Click "Deploy"
 

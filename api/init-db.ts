@@ -3,7 +3,7 @@
 // GET /api/init-db
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { initDatabase, initEmployeePortal } from './lib/db';
+import { initDatabase, initEmployeePortal, initAuditLogs, initQuoteApprovals, initXeroTokens } from './lib/db';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'GET') {
@@ -13,6 +13,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     await initDatabase();
     await initEmployeePortal();
+    await initAuditLogs();
+    await initQuoteApprovals();
+    await initXeroTokens();
     return res.status(200).json({ success: true, message: 'Database initialized successfully' });
   } catch (error: any) {
     console.error('Database initialization error:', error);

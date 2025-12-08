@@ -96,3 +96,22 @@ export function getClearAuthCookie(): string {
   return `auth-token=; HttpOnly${secureFlag}; SameSite=Lax; Path=/; Max-Age=0`;
 }
 
+/**
+ * Check if a user is an admin
+ * For now, checks against ADMIN_EMAILS environment variable (comma-separated)
+ * or allows all @creode.co.uk emails if ADMIN_EMAILS is not set
+ * This can be enhanced later with a proper admin table or role system
+ */
+export function isAdmin(user: User | null): boolean {
+  if (!user) return false;
+  
+  const adminEmails = process.env.ADMIN_EMAILS;
+  if (adminEmails) {
+    const emails = adminEmails.split(',').map(e => e.trim().toLowerCase());
+    return emails.includes(user.email.toLowerCase());
+  }
+  
+  // Default: allow all @creode.co.uk emails (can be restricted later)
+  return user.email.toLowerCase().endsWith('@creode.co.uk');
+}
+

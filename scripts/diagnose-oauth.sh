@@ -75,3 +75,5 @@ echo "   2. Check OAuth client authorized origins (see above)"
 echo "   3. Check Vercel function logs for detailed errors"
 echo "   4. Initialize database: https://productisation.vercel.app/api/init-db"
 
+
+

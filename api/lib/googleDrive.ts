@@ -104,6 +104,50 @@ export async function uploadDocument(
   }
 }
 
+export async function getQuotesFolderId(): Promise<string> {
+  try {
+    const drive = getDriveClient();
+    const rootFolderId = GOOGLE_DRIVE_FOLDER_ID || 'root';
+
+    // Check if quotes folder already exists
+    const existingFolders = await drive.files.list({
+      q: `name='Quotes' and parents in '${rootFolderId}' and mimeType='application/vnd.google-apps.folder' and trashed=false`,
+      fields: 'files(id, name)',
+    });
+
+    if (existingFolders.data.files && existingFolders.data.files.length > 0) {
+      return existingFolders.data.files[0].id!;
+    }
+
+    // Create new quotes folder
+    const folderResponse = await drive.files.create({
+      requestBody: {
+        name: 'Quotes',
+        mimeType: 'application/vnd.google-apps.folder',
+        parents: rootFolderId !== 'root' ? [rootFolderId] : undefined,
+      },
+      fields: 'id',
+    });
+
+    const folderId = folderResponse.data.id || '';
+    
+    // Make folder accessible to domain
+    await drive.permissions.create({
+      fileId: folderId,
+      requestBody: {
+        role: 'reader',
+        type: 'domain',
+        domain: 'creode.co.uk',
+      },
+    });
+
+    return folderId;
+  } catch (error) {
+    console.error('Error getting quotes folder:', error);
+    throw error;
+  }
+}
+
 export async function deleteDocument(fileId: string): Promise<void> {
   try {
     const drive = getDriveClient();
@@ -134,5 +178,6 @@ export async function getDocumentDownloadLink(fileId: string): Promise<string> {
 export function getRootFolderId(): string {
   return GOOGLE_DRIVE_FOLDER_ID || 'root';
 }
+
 
 

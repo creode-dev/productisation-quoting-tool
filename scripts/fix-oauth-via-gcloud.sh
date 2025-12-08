@@ -65,3 +65,5 @@ echo "  ✅ $PRODUCTION_URL/api/auth/google"
 echo ""
 echo "💡 After updating, wait 2-3 minutes for changes to propagate"
 
+
+

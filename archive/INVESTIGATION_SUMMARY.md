@@ -112,3 +112,5 @@ If JWT_SECRET is the default value, regenerate it using the commands above.
 - **Vercel Dashboard:** https://vercel.com/dashboard
 - **Vercel Logs:** Check deployment → Functions → View logs
 
+
+

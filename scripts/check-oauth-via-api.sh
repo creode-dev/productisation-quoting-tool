@@ -73,3 +73,5 @@ echo "   2. Find client: $CLIENT_ID"
 echo "   3. Verify 'Authorized JavaScript origins' includes: http://localhost:5174"
 
 
+
+

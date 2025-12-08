@@ -86,3 +86,5 @@ If you have other changes to commit, a normal push will trigger redeploy.
 
 The issue was the JWT_SECRET being too short (18 chars) or using the default value. With the new secure secret (44 chars) and a redeploy, the authentication should work correctly.
 
+
+

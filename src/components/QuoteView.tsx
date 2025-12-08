@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Quote, SavedQuote } from '../types/quote';
 import { PricingBreakdown } from './PricingBreakdown';
@@ -6,6 +7,9 @@ import { sendQuoteEmail } from '../utils/emailService';
 import { useQuoteStore } from '../store/quoteStore';
 import { useQuotesStore } from '../store/quotesStore';
 import { format } from 'date-fns';
+import { SendForSigningModal } from './SendForSigningModal';
+import { QuoteApprovalStatus } from './QuoteApprovalStatus';
+import { useAuth } from '../contexts/AuthContext';
 
 interface QuoteViewProps {
   quote: Quote;
@@ -17,6 +21,9 @@ export function QuoteView({ quote, savedQuote, onEdit }: QuoteViewProps) {
   const navigate = useNavigate();
   const reset = useQuoteStore((state) => state.reset);
   const { deleteQuote, acceptQuote } = useQuotesStore();
+  const { user } = useAuth();
+  const [showSendModal, setShowSendModal] = useState(false);
+  const [hasApproval, setHasApproval] = useState(false);
   
   const statusColors: Record<string, string> = {
     draft: 'bg-gray-100 text-gray-800',
@@ -88,6 +95,52 @@ export function QuoteView({ quote, savedQuote, onEdit }: QuoteViewProps) {
     }
   };
 
+  const handleSendForSigning = async (data: { signerEmail: string; signerName: string; message?: string }) => {
+    if (!savedQuote) {
+      throw new Error('Quote must be saved before sending for signing');
+    }
+
+    const response = await fetch(`/api/quotes/${savedQuote.id}/send-for-signing`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to send quote for signing');
+    }
+
+    const result = await response.json();
+    alert(`Quote sent for signing! Signing URL: ${result.signingUrl}`);
+    setHasApproval(true);
+    // Refresh the page to show updated status
+    window.location.reload();
+  };
+
+  // Check if quote has approval record
+  useEffect(() => {
+    if (savedQuote) {
+      fetch(`/api/quotes/${savedQuote.id}/approval-status`)
+        .then(res => res.json())
+        .then(data => {
+          setHasApproval(data.hasApproval);
+        })
+        .catch(() => {
+          // Ignore errors
+        });
+    }
+  }, [savedQuote]);
+
+  // Check if user can send for signing (quote creator or admin)
+  const canSendForSigning = savedQuote && 
+    (savedQuote.userId === user?.email || user?.email?.endsWith('@creode.co.uk')) &&
+    savedQuote.status !== 'accepted' &&
+    savedQuote.status !== 'rejected' &&
+    !hasApproval;
+
   const projectTypeLabels: Record<string, string> = {
     'web-dev': 'Web Development',
     'brand': 'Brand',
@@ -145,7 +198,15 @@ export function QuoteView({ quote, savedQuote, onEdit }: QuoteViewProps) {
             <div className="flex gap-3 flex-wrap">
               {savedQuote && (
                 <>
-                  {savedQuote.status !== 'accepted' && (
+                  {canSendForSigning && (
+                    <button
+                      onClick={() => setShowSendModal(true)}
+                      className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
+                    >
+                      Send for Signing
+                    </button>
+                  )}
+                  {savedQuote.status !== 'accepted' && savedQuote.status !== 'rejected' && !hasApproval && (
                     <button
                       onClick={handleAccept}
                       className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
@@ -186,15 +247,25 @@ export function QuoteView({ quote, savedQuote, onEdit }: QuoteViewProps) {
               >
                 Export PDF
               </button>
-              <button
-                onClick={handleSendEmail}
-                className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
-              >
-                Send Email
-              </button>
+              {savedQuote && (
+                <button
+                  onClick={handleSendEmail}
+                  className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
+                  title="Opens your email client (use 'Send for Signing' for electronic signatures)"
+                >
+                  Open in Email
+                </button>
+              )}
             </div>
           </div>
         </div>
+
+        {/* Approval Status */}
+        {savedQuote && hasApproval && (
+          <div className="mb-6">
+            <QuoteApprovalStatus quoteId={savedQuote.id} />
+          </div>
+        )}
 
         {/* Summary */}
         <div className="bg-white rounded-lg shadow p-6 mb-6">
@@ -221,8 +292,20 @@ export function QuoteView({ quote, savedQuote, onEdit }: QuoteViewProps) {
           ongoingCosts={quote.ongoingCosts}
           total={quote.total}
         />
+
+        {/* Send for Signing Modal */}
+        {savedQuote && (
+          <SendForSigningModal
+            isOpen={showSendModal}
+            onClose={() => setShowSendModal(false)}
+            onSend={handleSendForSigning}
+            quoteId={savedQuote.id}
+          />
+        )}
       </div>
     </div>
   );
 }
+
+
 

@@ -117,3 +117,5 @@ vercel env add JWT_SECRET production
 3. Check Vercel function logs for any errors
 4. Monitor for any remaining 500 errors
 
+
+

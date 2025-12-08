@@ -52,3 +52,5 @@ vercel --prod
 - ⏳ Vercel logs: Timing out (need to check via dashboard)
 - ❌ API endpoints: Still 500 (expected until redeploy)
 
+
+

@@ -11,6 +11,7 @@ import { EmployeePortal } from './components/EmployeePortal';
 import { TeamManagement } from './components/TeamManagement';
 import { EmployeeManagement } from './components/EmployeeManagement';
 import { HolidayApprovalQueue } from './components/HolidayApprovalQueue';
+import { AuditLogViewer } from './components/AuditLogViewer';
 import { AuthProvider } from './contexts/AuthContext';
 import { useQuoteStore } from './store/quoteStore';
 import { useQuotesStore } from './store/quotesStore';
@@ -182,6 +183,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <HolidayApprovalQueue />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="audit"
+            element={
+              <ProtectedRoute>
+                <AuditLogViewer />
               </ProtectedRoute>
             }
           />

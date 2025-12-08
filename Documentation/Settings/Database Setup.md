@@ -77,3 +77,5 @@ The initialization creates the following tables:
 - Review Vercel Postgres connection logs in the dashboard
 
 
+
+

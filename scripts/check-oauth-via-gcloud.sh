@@ -57,3 +57,5 @@ echo "   4. Check 'Authorized redirect URIs':"
 echo "      - Should include: https://productisation.vercel.app/api/auth/google"
 echo ""
 
+
+

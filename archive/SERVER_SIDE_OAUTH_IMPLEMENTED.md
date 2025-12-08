@@ -138,3 +138,5 @@ User → Click button → /api/auth/google/redirect → Google OAuth →
 
 The server-side OAuth flow is now implemented and ready to use. Once you update the redirect URI in Google Cloud Console and the deployment completes, the login should work without any origin mismatch errors.
 
+
+

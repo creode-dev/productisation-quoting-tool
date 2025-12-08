@@ -92,3 +92,5 @@ Then open: http://localhost:5174
 5. Check browser console for exact error message
 
 
+
+

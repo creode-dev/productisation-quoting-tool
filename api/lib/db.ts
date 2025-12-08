@@ -146,3 +146,109 @@ export async function initEmployeePortal() {
   }
 }
 
+// Initialize audit logs database schema
+export async function initAuditLogs() {
+  try {
+    // Create audit_logs table
+    await sql`
+      CREATE TABLE IF NOT EXISTS audit_logs (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        user_id TEXT NOT NULL,
+        action TEXT NOT NULL,
+        entity_type TEXT,
+        entity_id TEXT,
+        changes JSONB,
+        ip_address TEXT,
+        user_agent TEXT,
+        metadata JSONB,
+        created_at TIMESTAMP DEFAULT NOW()
+      )
+    `;
+
+    // Create indexes for audit_logs
+    await sql`
+      CREATE INDEX IF NOT EXISTS idx_audit_logs_user_id ON audit_logs(user_id)
+    `;
+    await sql`
+      CREATE INDEX IF NOT EXISTS idx_audit_logs_entity ON audit_logs(entity_type, entity_id)
+    `;
+    await sql`
+      CREATE INDEX IF NOT EXISTS idx_audit_logs_action ON audit_logs(action)
+    `;
+    await sql`
+      CREATE INDEX IF NOT EXISTS idx_audit_logs_created_at ON audit_logs(created_at DESC)
+    `;
+  } catch (error) {
+    console.error('Audit logs database initialization error:', error);
+    throw error;
+  }
+}
+
+// Initialize quote approvals database schema
+export async function initQuoteApprovals() {
+  try {
+    // Create quote_approvals table
+    await sql`
+      CREATE TABLE IF NOT EXISTS quote_approvals (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        quote_id UUID NOT NULL UNIQUE REFERENCES quotes(id) ON DELETE CASCADE,
+        hellosign_signature_request_id TEXT UNIQUE,
+        hellosign_signature_request_url TEXT,
+        signer_email TEXT NOT NULL,
+        signer_name TEXT NOT NULL,
+        status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'signed', 'declined', 'cancelled')),
+        po_required BOOLEAN DEFAULT false,
+        po_number TEXT,
+        rejection_reason TEXT,
+        signed_at TIMESTAMP,
+        declined_at TIMESTAMP,
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW()
+      )
+    `;
+
+    // Create indexes for quote_approvals
+    await sql`
+      CREATE INDEX IF NOT EXISTS idx_quote_approvals_quote_id ON quote_approvals(quote_id)
+    `;
+    await sql`
+      CREATE INDEX IF NOT EXISTS idx_quote_approvals_hellosign_id ON quote_approvals(hellosign_signature_request_id)
+    `;
+    await sql`
+      CREATE INDEX IF NOT EXISTS idx_quote_approvals_status ON quote_approvals(status)
+    `;
+  } catch (error) {
+    console.error('Quote approvals database initialization error:', error);
+    throw error;
+  }
+}
+
+// Initialize Xero tokens database schema
+export async function initXeroTokens() {
+  try {
+    // Create xero_tokens table
+    await sql`
+      CREATE TABLE IF NOT EXISTS xero_tokens (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        access_token TEXT NOT NULL,
+        refresh_token TEXT NOT NULL,
+        token_type TEXT DEFAULT 'Bearer',
+        expires_in INTEGER NOT NULL,
+        expires_at TIMESTAMP NOT NULL,
+        scope TEXT,
+        tenant_id TEXT,
+        tenant_ids TEXT[],
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW()
+      )
+    `;
+
+    // Create index for faster token lookups
+    await sql`
+      CREATE INDEX IF NOT EXISTS idx_xero_tokens_expires_at ON xero_tokens(expires_at)
+    `;
+  } catch (error) {
+    console.error('Xero tokens database initialization error:', error);
+    throw error;
+  }
+}

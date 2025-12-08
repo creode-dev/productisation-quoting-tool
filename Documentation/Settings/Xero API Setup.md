@@ -64,7 +64,7 @@ You have three options:
    - In your Xero app settings, click "Generate a secret" if you haven't already
    - You'll need to complete the OAuth 2.0 flow to get an access token
    - Visit the authorization URL (you can use Xero's OAuth playground or implement the flow):
-     ```
+     ```bash
      https://login.xero.com/identity/connect/authorize?response_type=code&client_id=YOUR_CLIENT_ID&redirect_uri=YOUR_REDIRECT_URI&scope=accounting.contacts.read offline_access
      ```
    - Grant permissions to your app
@@ -72,8 +72,15 @@ You have three options:
 
 2. **Exchange code for tokens**:
    - Exchange the authorization code for an access token and refresh token
-   - You can use Xero's OAuth playground: https://developer.xero.com/myapps/oauth-playground
-   - Or make a POST request to `https://identity.xero.com/connect/token` with:
+   - You can use Xero's OAuth playground: 
+     ```bash
+     https://developer.xero.com/myapps/oauth-playground
+     ```
+   - Or make a POST request to:
+     ```bash
+     https://identity.xero.com/connect/token
+     ```
+     With the following parameters:
      - `grant_type=authorization_code`
      - `code=YOUR_AUTHORIZATION_CODE`
      - `redirect_uri=YOUR_REDIRECT_URI`
@@ -82,10 +89,13 @@ You have three options:
 
 3. **Get Tenant ID**:
    - Once you have an access token, make a GET request to:
-     ```
+     ```bash
      https://api.xero.com/connections
      ```
-   - Include the header: `Authorization: Bearer YOUR_ACCESS_TOKEN`
+   - Include the header:
+     ```bash
+     Authorization: Bearer YOUR_ACCESS_TOKEN
+     ```
    - The response will contain an array of tenants, each with a `tenantId` field
    - Copy the `tenantId` for the organization you want to use
 
@@ -98,7 +108,11 @@ You have three options:
 ### Option 3: Using Access Token Directly (Simpler, but tokens expire)
 
 1. Follow Step 1 above to create your app and get Client ID/Secret
-2. Use Xero's OAuth playground (https://developer.xero.com/myapps/oauth-playground) to:
+2. Use Xero's OAuth playground to:
+   ```bash
+   https://developer.xero.com/myapps/oauth-playground
+   ```
+   This will allow you to:
    - Authorize your app
    - Get an access token
    - Get your tenant ID from the connections endpoint
@@ -136,5 +150,6 @@ Add the following environment variables:
 - Ensure `XERO_TENANT_ID` is set if using access token
 - Verify the access token hasn't expired (tokens expire after 30 minutes)
 - Check Xero Developer Portal for API errors or quota issues
+
 
 

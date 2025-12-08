@@ -2,6 +2,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { getCurrentUser } from '../lib/auth';
 import { sql } from '../lib/db';
 import { createCalendarEvent, getCentralCalendarId } from '../lib/googleCalendar';
+import { logAction, createChangesObject } from '../lib/audit';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const user = getCurrentUser(req);
@@ -782,7 +783,24 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         RETURNING *
       `;
 
-      return res.status(200).json({ holiday: result.rows[0] });
+      const newHoliday = result.rows[0];
+
+      // Log creation
+      await logAction(req, {
+        userId: user.email,
+        action: 'holiday.created',
+        entityType: 'holiday_request',
+        entityId: newHoliday.id,
+        changes: createChangesObject(null, newHoliday),
+        metadata: {
+          startDate,
+          endDate,
+          daysRequested,
+          status,
+        },
+      });
+
+      return res.status(200).json({ holiday: newHoliday });
     } catch (error) {
       console.error('Error creating holiday request:', error);
       return res.status(500).json({ error: 'Failed to create holiday request' });
