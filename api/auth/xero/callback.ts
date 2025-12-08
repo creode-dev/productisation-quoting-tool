@@ -160,21 +160,33 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const tokenData = await tokenResponse.json();
 
-    // Get tenant IDs
-    const connectionsResponse = await fetch('https://api.xero.com/connections', {
-      headers: {
-        'Authorization': `Bearer ${tokenData.access_token}`,
-        'Accept': 'application/json',
-      },
-    });
-
-    let tenantInfo = 'Unable to fetch tenant information';
+    // Get tenant IDs - prefer from env, fallback to API
+    const XERO_TENANT_ID = process.env.XERO_TENANT_ID?.trim();
     let tenantIds: string[] = [];
-    if (connectionsResponse.ok) {
-      const connections = await connectionsResponse.json();
-      tenantIds = connections.map((c: any) => c.tenantId);
-      tenantInfo = `Tenant IDs: ${tenantIds.join(', ')}`;
+    
+    if (XERO_TENANT_ID) {
+      // Use tenant IDs from environment variable
+      tenantIds = XERO_TENANT_ID.split(',').map(id => id.trim()).filter(id => id.length > 0);
+      console.log('Using tenant IDs from environment:', tenantIds);
+    } else {
+      // Fallback: fetch from Xero API
+      const connectionsResponse = await fetch('https://api.xero.com/connections', {
+        headers: {
+          'Authorization': `Bearer ${tokenData.access_token}`,
+          'Accept': 'application/json',
+        },
+      });
+
+      if (connectionsResponse.ok) {
+        const connections = await connectionsResponse.json();
+        tenantIds = connections.map((c: any) => c.tenantId);
+        console.log('Fetched tenant IDs from Xero API:', tenantIds);
+      }
     }
+
+    const tenantInfo = tenantIds.length > 0 
+      ? `Tenant IDs: ${tenantIds.join(', ')}`
+      : 'Unable to fetch tenant information';
 
     // Store tokens in database for automatic refresh
     try {

@@ -27,10 +27,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const query = req.query.q as string | undefined;
 
     if (!query) {
+      console.log('[Xero Companies API] No query provided');
       return res.status(200).json({ companies: [] });
     }
 
+    console.log(`[Xero Companies API] Searching for query: "${query}"`);
     const companies = await searchXeroCompanies(query);
+    console.log(`[Xero Companies API] Returning ${companies.length} companies`);
     return res.status(200).json({ companies });
   } catch (error) {
     console.error('Error fetching Xero companies:', error);

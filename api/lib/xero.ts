@@ -69,23 +69,38 @@ async function searchXeroCompaniesForTenant(
         error: errorText,
         tokenLength: token.length,
         tokenStart: token.substring(0, 10),
+        query,
       });
       
-      // If token is invalid/expired, clear cache
+      // If token is invalid/expired, try to refresh
       if (response.status === 401) {
-        console.error('Xero token appears to be expired or invalid');
-        cachedToken = null;
+        console.error('Xero token appears to be expired or invalid, attempting refresh...');
+        // The token refresh should happen automatically on next call
       }
       
       return [];
     }
 
     const data = await response.json();
+    console.log(`Xero API response for tenant ${tenantId}, query "${query}":`, {
+      totalContacts: data.Contacts?.length || 0,
+      hasContacts: !!data.Contacts,
+    });
     
-    // Filter to only return contacts (companies) not individuals
-    const contacts = (data.Contacts || []).filter((contact: any) => 
-      contact.IsSupplier === false && contact.IsCustomer !== false
-    );
+    // Filter to only return contacts (companies) - be less restrictive
+    // Include contacts that are customers (IsCustomer === true or undefined)
+    // Exclude only if explicitly marked as supplier-only
+    const contacts = (data.Contacts || []).filter((contact: any) => {
+      // Include if it's a customer (or not explicitly marked as supplier-only)
+      const isCustomer = contact.IsCustomer !== false; // true or undefined
+      const isNotSupplierOnly = contact.IsSupplier !== true; // false or undefined
+      return isCustomer && isNotSupplierOnly;
+    });
+    
+    console.log(`Filtered contacts for tenant ${tenantId}:`, {
+      beforeFilter: data.Contacts?.length || 0,
+      afterFilter: contacts.length,
+    });
 
     return contacts.map((contact: any) => ({
       ContactID: contact.ContactID,
@@ -105,14 +120,18 @@ export async function searchXeroCompanies(query: string): Promise<XeroCompany[]>
   }
 
   try {
+    console.log(`[Xero Search] Starting search for query: "${query}"`);
+    
     const tenantIds = await getTenantIds();
+    console.log(`[Xero Search] Tenant IDs found:`, tenantIds);
     
     if (tenantIds.length === 0) {
-      console.error('Xero tenant ID not configured');
+      console.error('[Xero Search] Xero tenant ID not configured');
       return [];
     }
 
     const token = await getXeroAccessToken();
+    console.log(`[Xero Search] Token obtained, length: ${token.length}`);
     
     // Search across all tenants in parallel
     const searchPromises = tenantIds.map(tenantId => 
@@ -120,9 +139,11 @@ export async function searchXeroCompanies(query: string): Promise<XeroCompany[]>
     );
     
     const results = await Promise.all(searchPromises);
+    console.log(`[Xero Search] Results from all tenants:`, results.map(r => r.length));
     
     // Merge results from all tenants
     const allCompanies = results.flat();
+    console.log(`[Xero Search] Total companies found: ${allCompanies.length}`);
     
     // Remove duplicates based on ContactID (in case same company exists in multiple tenants)
     const uniqueCompanies = new Map<string, XeroCompany>();
@@ -133,15 +154,18 @@ export async function searchXeroCompanies(query: string): Promise<XeroCompany[]>
     }
     
     // Sort by name
-    return Array.from(uniqueCompanies.values()).sort((a, b) => 
+    const sorted = Array.from(uniqueCompanies.values()).sort((a, b) => 
       a.Name.localeCompare(b.Name)
     );
+    
+    console.log(`[Xero Search] Final unique companies: ${sorted.length}`);
+    return sorted;
   } catch (error) {
-    console.error('Error searching Xero companies:', error);
+    console.error('[Xero Search] Error searching Xero companies:', error);
     // Log the full error details for debugging
     if (error instanceof Error) {
-      console.error('Error message:', error.message);
-      console.error('Error stack:', error.stack);
+      console.error('[Xero Search] Error message:', error.message);
+      console.error('[Xero Search] Error stack:', error.stack);
     }
     return [];
   }

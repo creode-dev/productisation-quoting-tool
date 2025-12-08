@@ -12,6 +12,7 @@ import { TeamManagement } from './components/TeamManagement';
 import { EmployeeManagement } from './components/EmployeeManagement';
 import { HolidayApprovalQueue } from './components/HolidayApprovalQueue';
 import { AuditLogViewer } from './components/AuditLogViewer';
+import { XeroSettings } from './components/XeroSettings';
 import { AuthProvider } from './contexts/AuthContext';
 import { useQuoteStore } from './store/quoteStore';
 import { useQuotesStore } from './store/quotesStore';
@@ -191,6 +192,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <AuditLogViewer />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="settings/xero"
+            element={
+              <ProtectedRoute>
+                <XeroSettings />
               </ProtectedRoute>
             }
           />
