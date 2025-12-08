@@ -1,8 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { getCurrentUser } from '../../lib/auth';
-import { sql } from '../../lib/db';
-import { initXeroTokens } from '../../lib/db';
-import { getXeroTokens, storeXeroTokens } from '../../lib/xeroTokens';
+import { getCurrentUser } from '../../lib/auth.js';
+import { sql, initXeroTokens } from '../../lib/db.js';
+import { getXeroTokens } from '../../lib/xeroTokens.js';
 
 /**
  * Setup endpoint to initialize Xero integration
@@ -12,7 +11,14 @@ import { getXeroTokens, storeXeroTokens } from '../../lib/xeroTokens';
  * 3. Provides status and next steps
  */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  const user = getCurrentUser(req);
+  let user;
+  try {
+    user = getCurrentUser(req);
+  } catch (error: any) {
+    console.error('Auth error in setup:', error);
+    return res.status(401).json({ error: 'Not authenticated', details: error.message });
+  }
+  
   if (!user) {
     return res.status(401).json({ error: 'Not authenticated' });
   }
@@ -36,12 +42,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         message: 'xero_tokens table exists or was created',
       });
     } catch (error: any) {
+      console.error('Error initializing xero_tokens table:', error);
       results.steps.push({
         step: 'Database table check',
         status: 'error',
-        message: error.message,
+        message: error.message || 'Failed to create xero_tokens table',
+        error: String(error),
       });
-      return res.status(500).json(results);
+      // Don't return error, continue with other checks
     }
 
     // Step 2: Check environment variables

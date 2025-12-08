@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { xeroAPI } from '../utils/api';
 
 interface XeroStatus {
   authenticated: boolean;

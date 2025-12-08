@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { getCurrentUser } from '../../lib/auth';
-import { getXeroTokens, getValidXeroAccessToken } from '../../lib/xeroTokens';
+import { getCurrentUser } from '../../lib/auth.js';
+import { getXeroTokens, getValidXeroAccessToken } from '../../lib/xeroTokens.js';
 
 // Helper to get tenant IDs (same logic as xero.ts)
 async function getTenantIdsHelper(): Promise<string[]> {

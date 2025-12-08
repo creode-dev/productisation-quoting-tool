@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { getCurrentUser } from '../../lib/auth';
-import { getXeroTokens } from '../../lib/xeroTokens';
+import { getCurrentUser } from '../../lib/auth.js';
+import { getXeroTokens } from '../../lib/xeroTokens.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const user = getCurrentUser(req);
