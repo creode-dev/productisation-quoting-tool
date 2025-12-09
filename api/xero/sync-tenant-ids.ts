@@ -31,7 +31,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Update tenant IDs in database if tokens exist
     const result = await sql`
       UPDATE xero_tokens
-      SET tenant_ids = ${tenantIds},
+      SET tenant_ids = ${sql`${tenantIds}`},
           updated_at = NOW()
       WHERE id IN (SELECT id FROM xero_tokens LIMIT 1)
       RETURNING id, tenant_ids
