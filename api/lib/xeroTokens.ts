@@ -93,9 +93,14 @@ export async function getXeroTokens(): Promise<XeroTokenData | null> {
       tenant_id: row.tenant_id,
       tenant_ids: row.tenant_ids,
     };
-  } catch (error) {
+  } catch (error: any) {
+    // If table doesn't exist, return null (not an error)
+    if (error.message?.includes('does not exist') || error.message?.includes('relation') || error.code === '42P01') {
+      console.log('xero_tokens table does not exist yet');
+      return null;
+    }
     console.error('Error getting Xero tokens:', error);
-    return null;
+    throw error; // Re-throw other errors
   }
 }
 

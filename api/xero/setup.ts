@@ -11,23 +11,22 @@ import { getXeroTokens } from '../../lib/xeroTokens';
  * 3. Provides status and next steps
  */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  let user;
   try {
-    user = getCurrentUser(req);
-  } catch (error: any) {
-    console.error('Auth error in setup:', error);
-    return res.status(401).json({ error: 'Not authenticated', details: error.message });
-  }
-  
-  if (!user) {
-    return res.status(401).json({ error: 'Not authenticated' });
-  }
+    let user;
+    try {
+      user = getCurrentUser(req);
+    } catch (error: any) {
+      console.error('Auth error in setup:', error);
+      return res.status(401).json({ error: 'Not authenticated', details: error.message });
+    }
+    
+    if (!user) {
+      return res.status(401).json({ error: 'Not authenticated' });
+    }
 
-  if (req.method !== 'POST' && req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-
-  try {
+    if (req.method !== 'POST' && req.method !== 'GET') {
+      return res.status(405).json({ error: 'Method not allowed' });
+    }
     const results: any = {
       timestamp: new Date().toISOString(),
       steps: [],
@@ -80,7 +79,27 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
 
     // Step 3: Check if tokens exist
-    const existingTokens = await getXeroTokens();
+    let existingTokens = null;
+    try {
+      existingTokens = await getXeroTokens();
+    } catch (error: any) {
+      console.error('Error getting Xero tokens:', error);
+      // If table doesn't exist yet, that's okay
+      if (error.message?.includes('does not exist') || error.message?.includes('relation')) {
+        results.steps.push({
+          step: 'Check tokens',
+          status: 'pending',
+          message: 'xero_tokens table not initialized yet',
+        });
+      } else {
+        results.steps.push({
+          step: 'Check tokens',
+          status: 'error',
+          message: error.message || 'Failed to check tokens',
+        });
+      }
+    }
+    
     results.tokens = {
       exists: !!existingTokens,
       hasAccessToken: !!existingTokens?.access_token,
@@ -144,10 +163,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(200).json(results);
   } catch (error: any) {
     console.error('Error in Xero setup:', error);
-    console.error('Error stack:', error.stack);
+    console.error('Error stack:', error?.stack);
+    console.error('Error name:', error?.name);
+    console.error('Error message:', error?.message);
     return res.status(500).json({
-      error: error.message || 'Failed to setup Xero',
+      error: error?.message || 'Failed to setup Xero',
       details: String(error),
+      name: error?.name,
       timestamp: new Date().toISOString(),
     });
   }
