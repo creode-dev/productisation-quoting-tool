@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { getCurrentUser } from '../../lib/auth.js';
-import { sql, initXeroTokens } from '../../lib/db.js';
-import { getXeroTokens } from '../../lib/xeroTokens.js';
+import { getCurrentUser } from '../../lib/auth';
+import { sql, initXeroTokens } from '../../lib/db';
+import { getXeroTokens } from '../../lib/xeroTokens';
 
 /**
  * Setup endpoint to initialize Xero integration

@@ -1,5 +1,5 @@
 const XERO_TENANT_ID = process.env.XERO_TENANT_ID?.trim();
-import { getValidXeroAccessToken, getXeroTokens } from './xeroTokens.js';
+import { getValidXeroAccessToken, getXeroTokens } from './xeroTokens';
 
 // Get array of tenant IDs (supports comma-separated list from env or database)
 async function getTenantIds(): Promise<string[]> {

@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { getCurrentUser } from '../../lib/auth.js';
-import { sql } from '../../lib/db.js';
+import { getCurrentUser } from '../../lib/auth';
+import { sql } from '../../lib/db';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   let user;
