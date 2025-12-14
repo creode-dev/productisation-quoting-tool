@@ -115,7 +115,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       try {
         await sql`
           UPDATE xero_tokens
-          SET tenant_ids = ${tenantIds},
+          SET tenant_ids = ${tenantIds as any},
               updated_at = NOW()
           WHERE id IN (SELECT id FROM xero_tokens LIMIT 1)
         `;

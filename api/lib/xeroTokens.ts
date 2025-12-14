@@ -46,7 +46,7 @@ export async function storeXeroTokens(tokenData: XeroTokenData): Promise<void> {
         ${expiresAt.toISOString()},
         ${tokenData.scope || null},
         ${tokenData.tenant_id || null},
-        ${tokenData.tenant_ids || null},
+        ${tokenData.tenant_ids ? (tokenData.tenant_ids as any) : null},
         NOW(),
         NOW()
       )
