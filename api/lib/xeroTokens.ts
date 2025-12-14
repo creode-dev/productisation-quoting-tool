@@ -1,4 +1,4 @@
-import { sql } from './db';
+import { sql } from './db.js';
 
 const XERO_CLIENT_ID = process.env.XERO_CLIENT_ID?.trim();
 const XERO_CLIENT_SECRET = process.env.XERO_CLIENT_SECRET?.trim();
