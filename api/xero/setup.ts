@@ -11,12 +11,13 @@ import { getXeroTokens } from '../../lib/xeroTokens';
  * 3. Provides status and next steps
  */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  // Wrap everything in try-catch to prevent crashes
   try {
     let user;
     try {
       user = getCurrentUser(req);
     } catch (error: any) {
-      console.error('Auth error in setup:', error);
+      console.error('[Xero Setup] Auth error:', error);
       return res.status(401).json({ error: 'Not authenticated', details: error.message });
     }
     
@@ -27,6 +28,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (req.method !== 'POST' && req.method !== 'GET') {
       return res.status(405).json({ error: 'Method not allowed' });
     }
+
     const results: any = {
       timestamp: new Date().toISOString(),
       steps: [],
