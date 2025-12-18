@@ -222,7 +222,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         quoteData,
       } = req.body;
 
-      if (!companyName || !projectName || !quoteData) {
+      if (!projectName || !quoteData) {
         return res.status(400).json({ error: 'Missing required fields' });
       }
 
@@ -238,7 +238,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           status
         ) VALUES (
           ${user.email},
-          ${companyName},
+          ${companyName || null},
           ${companyXeroId || null},
           ${projectName},
           ${businessUnit || null},

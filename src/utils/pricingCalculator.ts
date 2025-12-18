@@ -54,8 +54,16 @@ function calculateQuestionPrice(
         return getUnitPriceForQuantity(pricingItem, quantity);
       }
       
-      // Select questions - use unit cost
+      // Select questions - use option price if available, otherwise unit cost
       if (question.type === 'select') {
+        // Check if the selected option has a specific price
+        if (question.options && answer.value) {
+          const selectedOption = question.options.find(opt => opt.value === answer.value);
+          if (selectedOption?.price !== undefined) {
+            return selectedOption.price;
+          }
+        }
+        // Fallback to unit cost if no option price specified
         return pricingItem.unitCost;
       }
       
@@ -165,7 +173,15 @@ export function calculatePricing(
       let quantity: number;
       
       if (question.referencesSharedVariable && sharedVariables) {
-        // Use shared variable value instead of answer
+        // Optional shared-variable line:
+        // If there's an answer stored for this question, treat it as a boolean
+        // "include" flag. When false, we skip this line entirely.
+        const includeAnswer = answers[question.id];
+        if (includeAnswer && includeAnswer.value === false) {
+          continue;
+        }
+
+        // Use shared variable value instead of answer for quantity
         resolvedValue = sharedVariables[question.referencesSharedVariable];
         if (resolvedValue === undefined) {
           // Shared variable not set yet, skip this question

@@ -51,12 +51,15 @@ The tool supports multiple project types (Web Development, Brand, Campaigns) by 
 
 Create a Google Sheet with the following columns:
 
-| Phase | Item | Unit Cost (£) | Essential | Refresh | Transformation | Ranges | Tooltip | Question Type | Options | Min | Max | Required | Validation |
-|-------|------|---------------|-----------|---------|----------------|--------|---------|---------------|---------|-----|-----|----------|------------|
-| Discovery | Discovery questionnaire | 150 | 1 | 1 | 1 | | Info text | binary | | | | | |
-| Discovery | Stakeholder interviews | 500 | 0 | 1 | 1 | 1-2:500, 3-5:450, 6+:400 | Info text | number | | 0 | 10 | | integer |
-| UX | Wireframe detail level | 300 | 1 | 1 | 1 | | Info text | select | Basic, Detailed, Full | | | | |
-| UX | Project description | 0 | 1 | 1 | 1 | | | text | | | | | |
+| Phase | Item | Unit Cost (£) | Essential | Refresh | Transformation | Ranges | Tooltip | Question Type | Options | Min | Max | Required | Validation | Shared Variable |
+|-------|------|---------------|-----------|---------|----------------|--------|---------|---------------|---------|-----|-----|----------|------------|-----------------|
+| Discovery | Discovery questionnaire | 150 | 1 | 1 | 1 | | Info text | binary | | | | | | |
+| Discovery | Stakeholder interviews | 500 | 0 | 1 | 1 | 1-2:500, 3-5:450, 6+:400 | Info text | number | | 0 | 10 | | integer | |
+| UX | Wireframe detail level | 300 | 1 | 1 | 1 | | Info text | select | Basic, Detailed, Full | | | | | |
+| UX | Project description | 0 | 1 | 1 | 1 | | | text | | | | | | |
+| Discovery | Number of pages | 0 | 1 | 1 | 1 | | Total number of pages for the project | number | | 1 | 100 | | integer | pages |
+| Design | Page designs | 400 | 1 | 1 | 1 | | High-fidelity page designs | number | | 1 | 100 | | integer | {pages} |
+| Development | Page implementation | 500 | 1 | 1 | 1 | | Coding and development of pages | number | | 1 | 100 | | integer | {pages} |
 
 ### Column Descriptions
 
@@ -78,7 +81,13 @@ Create a Google Sheet with the following columns:
   - `range` - Number input with min/max range
   - `text` - Free text input
 - **Options** (optional): Comma-separated list of option labels for select questions
-  - Example: `Basic, Detailed, Full` or `Option 1, Option 2, Option 3`
+  - **Without prices**: `Basic, Detailed, Full` or `Option 1, Option 2, Option 3`
+    - All options will use the same price from the `Unit Cost (£)` column
+  - **With prices per option**: `Basic:£100, Detailed:£200, Full:£300` or `Option 1:£150, Option 2:£250`
+    - Each option can have its own price specified after a colon (`:`)
+    - Prices can include currency symbols (`£` or `$`) or just numbers
+    - Format: `Label:£Price` or `Label: Price` or `Label:Price`
+    - If prices are specified, they override the `Unit Cost (£)` column for that option
   - Only used when Question Type is `select`
 - **Min** (optional): Minimum value for number/range questions
 - **Max** (optional): Maximum value for number/range questions
@@ -88,6 +97,10 @@ Create a Google Sheet with the following columns:
   - `positive` - Only positive numbers
   - `email` - Email format validation
   - Custom validation text can be added here
+- **Shared Variable** (optional): Allows values to be shared across multiple questions/phases
+  - To **define** a shared variable: Enter the variable name (e.g., `pages`, `components`, `users`)
+  - To **reference** a shared variable: Use curly braces (e.g., `{pages}`, `{components}`, `{users}`)
+  - See [Shared Variables](#3-shared-variables) section below for detailed usage
 
 ### 2. Range-Based Pricing Format
 
@@ -107,7 +120,49 @@ For items with quantity-based pricing, use the Ranges column:
 - If quantity falls within a range, that range's price is used
 - If quantity exceeds all ranges, the highest range price is used
 
-### 3. Make Sheet Public (IMPORTANT)
+### 3. Shared Variables
+
+Shared variables allow you to define a value once and use it across multiple questions and phases. This is particularly useful for values like "number of pages", "number of components", or "number of users" that affect multiple deliverables.
+
+**How It Works:**
+
+1. **Define a Shared Variable**: In the "Shared Variable" column, enter a variable name (e.g., `pages`, `components`, `users`)
+   - This question will capture the value and store it as a shared variable
+   - The value can be edited from any question that references it
+
+2. **Reference a Shared Variable**: In the "Shared Variable" column, use curly braces with the variable name (e.g., `{pages}`, `{components}`, `{users}`)
+   - This question will automatically use the value from the shared variable
+   - The question will display as read-only with an "Edit" button
+   - Editing the value from any reference will update all references across all phases
+
+**Example Use Cases:**
+
+- **Number of Pages**: Define `pages` in Discovery phase, then reference `{pages}` in Design and Development phases
+- **Number of Components**: Define `components` once, reference `{components}` for component design, component development, component testing
+- **Number of Users**: Define `users` for user research, reference `{users}` for user testing sessions, user training, etc.
+
+**Example Sheet Rows:**
+
+```
+Phase,Item,Unit Cost (£),Essential,Refresh,Transformation,Ranges,Tooltip,Question Type,Options,Min,Max,Required,Validation,Shared Variable
+Discovery,Number of pages,0,1,1,1,,"Total number of pages for the project",number,,1,100,,integer,pages
+Design,Page designs,400,1,1,1,,"High-fidelity page designs",number,,1,100,,integer,{pages}
+Development,Page implementation,500,1,1,1,,"Coding and development of pages",number,,1,100,,integer,{pages}
+Discovery,Number of components,0,1,1,1,,"Total number of reusable components",number,,1,50,,integer,components
+Design,Component designs,350,1,1,1,,"Design of reusable components",number,,1,50,,integer,{components}
+Development,Component implementation,450,1,1,1,,"Development of reusable components",number,,1,50,,integer,{components}
+```
+
+**Important Notes:**
+
+- Variable names are case-sensitive (`pages` ≠ `Pages`)
+- A variable must be **defined** before it can be **referenced**
+- When a user edits a shared variable value from any reference, it updates all references immediately
+- Shared variables work across all phases - you can define in one phase and reference in another
+- The question that defines the variable will show a normal input field
+- Questions that reference the variable will show a read-only display with an "Edit" button and a "Shared" badge
+
+### 4. Make Sheet Public (IMPORTANT)
 
 The sheet must be publicly accessible for the tool to read it. Follow these steps:
 
@@ -133,7 +188,7 @@ The sheet must be publicly accessible for the tool to read it. Follow these step
 - Try opening the sheet in an incognito/private browser window to verify it's truly public
 - The Sheet ID is the long string in the URL: `https://docs.google.com/spreadsheets/d/{SHEET_ID}/edit`
 
-### 4. Get the Sheet ID
+### 5. Get the Sheet ID
 
 From your Google Sheet URL:
 ```
@@ -142,7 +197,7 @@ https://docs.google.com/spreadsheets/d/{SHEET_ID}/edit#gid=0
 
 Copy the `{SHEET_ID}` part (the long string between `/d/` and `/edit`)
 
-### 5. Configure the Application
+### 6. Configure the Application
 
 #### Option A: Environment Variable (Recommended)
 
@@ -176,16 +231,20 @@ const GOOGLE_SHEET_ID = 'your-sheet-id-here';
 ## Example Sheet Structure
 
 ```
-Phase,Item,Unit Cost (£),Essential,Refresh,Transformation,Ranges,Tooltip,Question Type,Options,Min,Max,Required,Validation
-Discovery,Discovery questionnaire,150,1,1,1,,"Initial questionnaire to understand project requirements",binary,,,,
-Discovery,Stakeholder interviews,500,0,1,1,"1-2:500, 3-5:450, 6+:400","One-on-one interviews with key stakeholders",number,,0,10,,integer
-Discovery,Customer interviews,600,0,0,1,"1-3:600, 4-6:550, 7+:500","Direct interviews with end users",number,,0,20,,integer
-UX,Wireframe detail level,300,1,1,1,,"Level of detail in wireframes",select,"Basic (PDF), Detailed (Figma), Full (Figma + annotations)",,,
-UX,User testing sessions,400,0,0,1,"1-3:400, 4-6:350, 7+:300","Usability testing sessions with real users",number,,1,10,,integer
-Design,Template designs,400,1,1,1,,"High-fidelity design templates",number,,1,20,,integer
-Development,Template implementation,500,1,1,1,,"Coding and development of templates",number,,1,30,,integer
-Development,Number of custom blocks,300,0,1,1,"1-5:300, 6-10:280, 11+:250","Custom reusable content blocks",number,,0,50,,integer
-UX,Project description,0,1,1,1,,"Brief description of the project",text,,,,
+Phase,Item,Unit Cost (£),Essential,Refresh,Transformation,Ranges,Tooltip,Question Type,Options,Min,Max,Required,Validation,Shared Variable
+Discovery,Discovery questionnaire,150,1,1,1,,"Initial questionnaire to understand project requirements",binary,,,,,,
+Discovery,Stakeholder interviews,500,0,1,1,"1-2:500, 3-5:450, 6+:400","One-on-one interviews with key stakeholders",number,,0,10,,integer,
+Discovery,Customer interviews,600,0,0,1,"1-3:600, 4-6:550, 7+:500","Direct interviews with end users",number,,0,20,,integer,
+Discovery,Number of pages,0,1,1,1,,"Total number of pages for the project",number,,1,100,,integer,pages
+UX,Wireframe detail level,300,1,1,1,,"Level of detail in wireframes",select,"Basic (PDF), Detailed (Figma), Full (Figma + annotations)",,,,,,
+UX,Service level,0,1,1,1,,"Choose your service level",select,"Basic:£500, Standard:£1000, Premium:£2000",,,,,,
+UX,User testing sessions,400,0,0,1,"1-3:400, 4-6:350, 7+:300","Usability testing sessions with real users",number,,1,10,,integer,
+Design,Page designs,400,1,1,1,,"High-fidelity page designs",number,,1,100,,integer,{pages}
+Design,Template designs,400,1,1,1,,"High-fidelity design templates",number,,1,20,,integer,,
+Development,Page implementation,500,1,1,1,,"Coding and development of pages",number,,1,100,,integer,{pages}
+Development,Template implementation,500,1,1,1,,"Coding and development of templates",number,,1,30,,integer,,
+Development,Number of custom blocks,300,0,1,1,"1-5:300, 6-10:280, 11+:250","Custom reusable content blocks",number,,0,50,,integer,
+UX,Project description,0,1,1,1,,"Brief description of the project",text,,,,,,
 ```
 
 ### Question Type Examples
@@ -198,9 +257,10 @@ UX,Project description,0,1,1,1,,"Brief description of the project",text,,,,
 
 **Select (Radio Buttons):**
 - Question Type: `select`
-- Options: `Option 1, Option 2, Option 3` (comma-separated)
+- Options: `Option 1, Option 2, Option 3` (comma-separated) OR `Option 1:£100, Option 2:£200, Option 3:£300` (with prices)
 - Min/Max: Not used
-- Example: "Wireframe detail level" with options "Basic, Detailed, Full"
+- Example 1: "Wireframe detail level" with options "Basic, Detailed, Full" (all use same Unit Cost)
+- Example 2: "Service level" with options "Basic:£500, Standard:£1000, Premium:£2000" (each option has different price)
 
 **Number:**
 - Question Type: `number`
@@ -234,6 +294,46 @@ The **Tooltip** column allows you to add descriptive information that appears wh
 
 **Note**: The tooltip text will only appear for **select-type questions** (radio button options). For other question types, you can use the `helpText` field in the questionnaire CSV.
 
+### Shared Variables Examples
+
+**Defining a Shared Variable:**
+
+```
+Phase: Discovery
+Item: Number of pages
+Shared Variable: pages
+Question Type: number
+Min: 1
+Max: 100
+```
+
+This creates a question where users enter the number of pages, and the value is stored as the `pages` shared variable.
+
+**Referencing a Shared Variable:**
+
+```
+Phase: Design
+Item: Page designs
+Shared Variable: {pages}
+Question Type: number
+```
+
+This question will automatically use the value from the `pages` shared variable. The question will display as read-only with an "Edit" button. When the user clicks "Edit", they can update the value, which will update all references to `{pages}` across all phases.
+
+**Multiple References:**
+
+You can reference the same shared variable in multiple questions:
+
+```
+Discovery | Number of pages | pages
+Design | Page designs | {pages}
+Design | Page templates | {pages}
+Development | Page implementation | {pages}
+Development | Page testing | {pages}
+```
+
+All questions with `{pages}` will use the same value, and editing from any of them updates all of them.
+
 ## Troubleshooting
 
 ### Sheet not loading?
@@ -253,4 +353,11 @@ The **Tooltip** column allows you to add descriptive information that appears wh
 - Check range format is correct
 - Ensure ranges are in ascending order
 - Verify no spaces in range definitions (except after commas)
+
+### Shared variables not working?
+- Ensure variable names match exactly (case-sensitive)
+- Variable must be defined (without curly braces) before it can be referenced (with curly braces)
+- Check that the Shared Variable column header is exactly "Shared Variable" or "SharedVariable"
+- Verify that references use curly braces: `{variableName}` not `variableName`
+- Make sure the defining question appears before referencing questions in the form flow (or at least in an earlier phase)
 

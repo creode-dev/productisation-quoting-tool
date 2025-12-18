@@ -6,6 +6,11 @@ export interface PriceRange {
   price: number;
 }
 
+export interface OptionWithPrice {
+  label: string;
+  price?: number; // Optional price for this specific option
+}
+
 export interface PricingItem {
   phase: string;
   item: string;
@@ -16,7 +21,8 @@ export interface PricingItem {
   transformation: number;
   description?: string; // Description text displayed above the input
   questionType?: 'binary' | 'select' | 'number' | 'range' | 'text'; // Override question type
-  options?: string; // Comma-separated options for select questions (e.g., "Option 1, Option 2, Option 3")
+  options?: string; // Comma-separated options for select questions (e.g., "Option 1, Option 2, Option 3" or "Option 1:£100, Option 2:£200")
+  optionPrices?: OptionWithPrice[]; // Parsed options with prices (if prices are specified)
   min?: number; // Minimum value for number/range questions
   max?: number; // Maximum value for number/range questions
   required?: boolean; // Whether question is required
@@ -77,9 +83,50 @@ export async function parsePricingConfig(
                 ? questionTypeStr as PricingItem['questionType']
                 : undefined;
               
-              // Parse options (comma-separated)
+              // Parse options (comma-separated, optionally with prices like "Option 1:£100, Option 2:£200")
               const optionsStr = row.Options || row['Option Labels'] || '';
-              const options = optionsStr.trim() ? optionsStr.split(',').map((opt: string) => opt.trim()).filter((opt: string) => opt) : undefined;
+              let options: string[] | undefined;
+              let optionPrices: OptionWithPrice[] | undefined;
+              
+              if (optionsStr.trim()) {
+                const optionParts = optionsStr
+                  .split(',')
+                  .map((opt: string) => opt.trim())
+                  .filter((opt: string) => opt);
+                
+                // Check if any option has a price (contains :£ or :$ or just : followed by a number)
+                const hasPrices = optionParts.some((opt: string) =>
+                  /:\s*[£$]?\d+(?:\.\d+)?/.test(opt)
+                );
+                
+                if (hasPrices) {
+                  // Parse options with prices
+                  const parsedOptionPrices: OptionWithPrice[] = optionParts.map((opt: string) => {
+                    // Match pattern like "Option 1:£100" or "Option 1: 100" or "Option 1:100"
+                    const match = opt.match(/^(.+?):\s*[£$]?(\d+(?:\.\d+)?)$/);
+                    if (match) {
+                      return {
+                        label: match[1].trim(),
+                        price: parseFloat(match[2])
+                      };
+                    } else {
+                      // No price found, just label
+                      return {
+                        label: opt,
+                        price: undefined
+                      };
+                    }
+                  });
+
+                  optionPrices = parsedOptionPrices;
+
+                  // Also store as simple string array for backward compatibility
+                  options = parsedOptionPrices.map((opt: OptionWithPrice) => opt.label);
+                } else {
+                  // No prices, just labels
+                  options = optionParts;
+                }
+              }
               
               // Parse min/max
               const min = row.Min ? parseFloat(String(row.Min)) : undefined;
@@ -104,6 +151,7 @@ export async function parsePricingConfig(
                 description: row.Description?.trim() || row['Description Text']?.trim() || row['Info Text']?.trim() || undefined,
                 questionType,
                 options: options && options.length > 0 ? options.join(', ') : undefined,
+                optionPrices: optionPrices && optionPrices.length > 0 ? optionPrices : undefined,
                 min: isNaN(min!) ? undefined : min,
                 max: isNaN(max!) ? undefined : max,
                 required: required || undefined,

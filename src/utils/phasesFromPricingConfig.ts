@@ -124,14 +124,26 @@ function buildQuestionFromPricingItem(item: PricingItem, phaseOrder: number): Qu
       
     case 'select':
       if (item.options) {
-        const optionLabels = item.options.split(',').map(opt => opt.trim()).filter(opt => opt);
-        question.options = optionLabels.map((label, index) => ({
-          value: `option-${index + 1}`,
-          label: label,
-          tier: undefined,
-          price: undefined,
-          isAddOn: false
-        }));
+        // Use optionPrices if available (when prices are specified in the sheet)
+        if (item.optionPrices && item.optionPrices.length > 0) {
+          question.options = item.optionPrices.map((optWithPrice, index) => ({
+            value: `option-${index + 1}`,
+            label: optWithPrice.label,
+            tier: undefined,
+            price: optWithPrice.price, // Use the price from the sheet
+            isAddOn: false
+          }));
+        } else {
+          // No prices specified, parse from options string
+          const optionLabels = item.options.split(',').map(opt => opt.trim()).filter(opt => opt);
+          question.options = optionLabels.map((label, index) => ({
+            value: `option-${index + 1}`,
+            label: label,
+            tier: undefined,
+            price: undefined,
+            isAddOn: false
+          }));
+        }
         question.defaultValue = question.options[0]?.value || 'option-1';
       } else {
         // Fallback: create options from tier values

@@ -7,12 +7,6 @@ import { LoginPage } from './components/LoginPage';
 import { DocumentationPage } from './components/DocumentationPage';
 import { AppLayout } from './components/AppLayout';
 import { ProtectedRoute } from './components/ProtectedRoute';
-import { EmployeePortal } from './components/EmployeePortal';
-import { TeamManagement } from './components/TeamManagement';
-import { EmployeeManagement } from './components/EmployeeManagement';
-import { HolidayApprovalQueue } from './components/HolidayApprovalQueue';
-import { AuditLogViewer } from './components/AuditLogViewer';
-import { XeroSettings } from './components/XeroSettings';
 import { AuthProvider } from './contexts/AuthContext';
 import { useQuoteStore } from './store/quoteStore';
 import { useQuotesStore } from './store/quotesStore';
@@ -37,7 +31,7 @@ function QuoteApp() {
 
   const handleSave = async () => {
     const state = useQuoteStore.getState();
-    if (!state.companyName || !state.projectName || !state.projectType || state.selectedPhases.length === 0) {
+    if (!state.projectName || !state.projectType || state.selectedPhases.length === 0) {
       alert('Please fill in all required fields and complete the quote');
       return;
     }
@@ -45,7 +39,7 @@ function QuoteApp() {
     try {
       const quote = buildQuote(state.projectType, state.answers, state.phases, state.selectedPhases);
       await saveQuote({
-        companyName: state.companyName,
+        companyName: state.companyName || undefined,
         companyXeroId: state.companyXeroId || undefined,
         projectName: state.projectName,
         businessUnit: state.businessUnit || undefined,
@@ -152,54 +146,6 @@ function App() {
             element={
               <ProtectedRoute>
                 <SavedQuoteView />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="portal"
-            element={
-              <ProtectedRoute>
-                <EmployeePortal />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="portal/teams"
-            element={
-              <ProtectedRoute>
-                <TeamManagement />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="portal/employees"
-            element={
-              <ProtectedRoute>
-                <EmployeeManagement />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="portal/approvals"
-            element={
-              <ProtectedRoute>
-                <HolidayApprovalQueue />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="audit"
-            element={
-              <ProtectedRoute>
-                <AuditLogViewer />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="settings/xero"
-            element={
-              <ProtectedRoute>
-                <XeroSettings />
               </ProtectedRoute>
             }
           />

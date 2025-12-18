@@ -30,7 +30,7 @@ Click on the project type that matches your client's needs. This will load the a
 
 After selecting a project type, you'll be asked to provide:
 
-- **Company** (required) - Start typing the company name. If the company exists in Xero, you'll see autocomplete suggestions. You can select from the list or type a new company name.
+- **Company** (optional) - Start typing the company name. If the company exists in Xero, you'll see autocomplete suggestions. You can select from the list or type a new company name.
 - **Project Name** (required) - Enter a descriptive name for the project
 - **Business Unit** (optional) - Specify which business unit this quote is for
 - **Target Completion Date** (optional) - Select when you expect to complete the project
@@ -198,6 +198,7 @@ If you encounter issues or have questions:
 1. Check the [Quoting System Configuration](../Settings/Quoting%20System%20Configuration.md) guide for technical details
 2. Contact your system administrator
 3. Review the pricing configuration Google Sheet to understand available options
+
 
 
 

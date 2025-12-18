@@ -49,7 +49,8 @@ export const quotesAPI = {
   },
 
   create: async (quote: {
-    companyName: string;
+    // Company name is optional so that quotes can be created without a linked client
+    companyName?: string;
     companyXeroId?: string;
     projectName: string;
     businessUnit?: string;

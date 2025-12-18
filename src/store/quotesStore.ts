@@ -8,7 +8,8 @@ interface QuotesStore {
   error: string | null;
   fetchQuotes: () => Promise<void>;
   saveQuote: (quote: {
-    companyName: string;
+    // Company name is optional so that quotes can be created without a linked client
+    companyName?: string;
     companyXeroId?: string;
     projectName: string;
     businessUnit?: string;

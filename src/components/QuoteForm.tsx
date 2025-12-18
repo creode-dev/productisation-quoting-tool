@@ -302,13 +302,12 @@ export function QuoteForm({ showPrices: showPricesProp = false }: QuoteFormProps
             <div className="space-y-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Company <span className="text-red-500">*</span>
+                  Company (Optional)
                 </label>
                 <CompanyAutocomplete
                   value={companyName}
                   onChange={handleCompanySelect}
                   placeholder="Search for a company..."
-                  required
                 />
               </div>
               
@@ -361,8 +360,8 @@ export function QuoteForm({ showPrices: showPricesProp = false }: QuoteFormProps
               </button>
               <button
                 onClick={() => {
-                  if (!companyName || !projectName) {
-                    alert('Please fill in company and project name');
+                  if (!projectName) {
+                    alert('Please fill in project name');
                     return;
                   }
                   setCurrentStep(1);

@@ -51,8 +51,16 @@ function calculateQuestionPrice(
     return pricingItem.unitCost * quantity;
   }
   
-  // Select questions
+  // Select questions - use option price if available, otherwise unit cost
   if (question.type === 'select') {
+    // Check if the selected option has a specific price
+    if (question.options && answer.value) {
+      const selectedOption = question.options.find(opt => opt.value === answer.value);
+      if (selectedOption?.price !== undefined) {
+        return selectedOption.price;
+      }
+    }
+    // Fallback to unit cost if no option price specified
     return pricingItem.unitCost;
   }
   
@@ -242,10 +250,14 @@ export function QuestionRenderer({ question, answer, onChange, phaseName, showPr
 
       // Create a temporary answer for price calculation
       const tempAnswer: Answer = { questionId: question.id, value: value ?? '' };
-      const price = showPrices ? calculateQuestionPrice(configuredQuestion, tempAnswer, phaseName) : 0;
+      const basePrice = showPrices ? calculateQuestionPrice(configuredQuestion, tempAnswer, phaseName) : 0;
       
-      // If this is a shared variable reference, show read-only display with edit button
+      // If this is a shared variable reference, show read-only value with an optional include toggle
       if (isSharedVarReference && hasSharedVarValue) {
+        // Treat the stored answer (if any) as an "include" toggle. Default is included.
+        const include = answer?.value !== false;
+        const price = include ? basePrice : 0;
+
         return (
           <>
             <div className="py-3">
@@ -273,13 +285,24 @@ export function QuestionRenderer({ question, answer, onChange, phaseName, showPr
                 <div className="flex-1 px-4 py-3 text-base border-2 border-gray-300 rounded-lg bg-gray-50">
                   <span className="text-gray-900 font-medium">{currentValue}</span>
                 </div>
-                <button
-                  type="button"
-                  onClick={handleEditSharedVariable}
-                  className="px-4 py-2 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-300 rounded-lg hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  Edit
-                </button>
+                <div className="flex flex-col items-end gap-2">
+                  <label className="inline-flex items-center text-sm text-gray-700">
+                    <input
+                      type="checkbox"
+                      checked={include}
+                      onChange={(e) => onChange(e.target.checked)}
+                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+                    />
+                    <span className="ml-2">Include</span>
+                  </label>
+                  <button
+                    type="button"
+                    onClick={handleEditSharedVariable}
+                    className="px-4 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 border border-blue-300 rounded-lg hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    Edit shared value
+                  </button>
+                </div>
               </div>
             </div>
             <SharedVariableEditor
@@ -309,9 +332,9 @@ export function QuestionRenderer({ question, answer, onChange, phaseName, showPr
                 <p className="mt-2 text-base text-gray-600">{configuredQuestion.helpText}</p>
               )}
             </div>
-            {showPrices && price > 0 && (
+            {showPrices && basePrice > 0 && (
               <div className="ml-4 text-right">
-                <div className="text-lg font-semibold text-gray-900">£{formatPrice(price)}</div>
+                <div className="text-lg font-semibold text-gray-900">£{formatPrice(basePrice)}</div>
               </div>
             )}
           </div>
@@ -424,10 +447,14 @@ export function QuestionRenderer({ question, answer, onChange, phaseName, showPr
 
       // Create a temporary answer for price calculation
       const tempAnswer: Answer = { questionId: question.id, value: value ?? '' };
-      const price = showPrices ? calculateQuestionPrice(configuredQuestion, tempAnswer, phaseName) : 0;
+      const basePrice = showPrices ? calculateQuestionPrice(configuredQuestion, tempAnswer, phaseName) : 0;
       
-      // If this is a shared variable reference, show read-only display with edit button
+      // If this is a shared variable reference, show read-only value with an optional include toggle
       if (isSharedVarReference && hasSharedVarValue) {
+        // Treat the stored answer (if any) as an "include" toggle. Default is included.
+        const include = answer?.value !== false;
+        const price = include ? basePrice : 0;
+
         return (
           <>
             <div className="py-3">
@@ -455,13 +482,24 @@ export function QuestionRenderer({ question, answer, onChange, phaseName, showPr
                 <div className="flex-1 px-4 py-3 text-base border-2 border-gray-300 rounded-lg bg-gray-50">
                   <span className="text-gray-900 font-medium">{currentValue}</span>
                 </div>
-                <button
-                  type="button"
-                  onClick={handleEditSharedVariable}
-                  className="px-4 py-2 text-sm font-medium text-blue-700 bg-blue-50 border border-blue-300 rounded-lg hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  Edit
-                </button>
+                <div className="flex flex-col items-end gap-2">
+                  <label className="inline-flex items-center text-sm text-gray-700">
+                    <input
+                      type="checkbox"
+                      checked={include}
+                      onChange={(e) => onChange(e.target.checked)}
+                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+                    />
+                    <span className="ml-2">Include</span>
+                  </label>
+                  <button
+                    type="button"
+                    onClick={handleEditSharedVariable}
+                    className="px-4 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 border border-blue-300 rounded-lg hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    Edit shared value
+                  </button>
+                </div>
               </div>
             </div>
             <SharedVariableEditor
@@ -491,9 +529,9 @@ export function QuestionRenderer({ question, answer, onChange, phaseName, showPr
                 <p className="mt-2 text-base text-gray-600">{configuredQuestion.helpText}</p>
               )}
             </div>
-            {showPrices && price > 0 && (
+            {showPrices && basePrice > 0 && (
               <div className="ml-4 text-right">
-                <div className="text-lg font-semibold text-gray-900">£{formatPrice(price)}</div>
+                <div className="text-lg font-semibold text-gray-900">£{formatPrice(basePrice)}</div>
               </div>
             )}
           </div>
@@ -531,7 +569,17 @@ export function QuestionRenderer({ question, answer, onChange, phaseName, showPr
     }
 
     case 'select': {
-      const price = showPrices ? calculateQuestionPrice(configuredQuestion, answer, phaseName) : 0;
+      // Build a current answer object based on the latest value so pricing always
+      // reflects the selected option, even if the stored answer lags slightly.
+      const currentValue = value ?? answer?.value;
+      const currentAnswer: Answer | undefined =
+        currentValue !== undefined
+          ? { questionId: question.id, value: currentValue }
+          : answer;
+
+      const price = showPrices
+        ? calculateQuestionPrice(configuredQuestion, currentAnswer, phaseName)
+        : 0;
       return (
         <div className="py-3">
           <div className="flex items-start justify-between mb-4">
